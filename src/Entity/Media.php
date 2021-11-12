@@ -46,14 +46,9 @@ class Media
         return $this->id;
     }
 
-    public function getPath(): string
+    public function getPath(): ?string
     {
         return $this->path;
-    }
-
-    public function getPathInfo(): ?\SplFileInfo
-    {
-        return null !== $this->path ? new \SplFileInfo($this->path) : null;
     }
 
     public function getOriginalName(): ?string
