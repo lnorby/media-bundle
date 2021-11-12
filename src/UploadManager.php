@@ -139,7 +139,7 @@ final class UploadManager
             substr($uniqueFilename, 0, 2),
             substr($uniqueFilename, 2, 2),
             substr($uniqueFilename, 4, 2),
-            $uniqueFilename,
+            substr($uniqueFilename, 6),
             $extension
         );
     }
