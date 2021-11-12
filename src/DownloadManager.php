@@ -104,15 +104,7 @@ final class DownloadManager
 
     private function createFileResponse(string $path): BinaryFileResponse
     {
-        $response = new BinaryFileResponse(
-            $this->storage->getRealPath($path),
-            200,
-            [],
-            true,
-            null,
-            false,
-            false
-        );
+        $response = new BinaryFileResponse($this->storage->getRealPath($path), 200, [], false);
         $response->setMaxAge(31536000);
 
         return $response;
