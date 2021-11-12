@@ -5,6 +5,7 @@ namespace Lnorby\MediaBundle\Controller;
 use Lnorby\MediaBundle\DownloadManager;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
+use Lnorby\MediaBundle\Exception\CouldNotDownloadFile;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
@@ -12,7 +13,6 @@ use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
 use Lnorby\MediaBundle\MediaManager;
 use Lnorby\MediaBundle\UploadManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class MediaController extends AbstractController
 {
     /**
-     * @Route("/{id}/{originalName}", name="_media_download", methods={"GET"}, priority=-1)
+     * @Route("/{id}/{originalName<[^/]+>}", name="_media_download", methods={"GET"}, priority=-1)
      */
     public function download(Media $media, string $originalName, Request $request, DownloadManager $downloadManager): Response
     {
@@ -35,17 +35,17 @@ class MediaController extends AbstractController
         $height = $request->query->getInt('h');
         $mode = $request->query->get('m');
 
-        if (0 !== $width && 0 !== $height && null !== $mode && in_array($mode, ['r', 'c'])) {
+        if (0 !== $width && 0 !== $height && null !== $mode && in_array($mode, [DownloadManager::IMAGE_RESIZE, DownloadManager::IMAGE_CROP])) {
             try {
-                return $downloadManager->downloadImage($media, $width, $height, $mode);
-            } catch (\RuntimeException $e) {
+                return $downloadManager->downloadModifiedImage($media, $width, $height, $mode);
+            } catch (CouldNotDownloadFile $e) {
                 throw $this->createNotFoundException();
             }
         }
 
         try {
             return $downloadManager->downloadFile($media);
-        } catch (\RuntimeException $e) {
+        } catch (CouldNotDownloadFile $e) {
             throw $this->createNotFoundException();
         }
     }
@@ -75,9 +75,6 @@ class MediaController extends AbstractController
      */
     public function uploadFile(Media $media, Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
-        /**
-         * @var UploadedFile $file
-         */
         $file = $request->files->get('file');
 
         try {
@@ -90,7 +87,7 @@ class MediaController extends AbstractController
             return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
 
-        return new Response($downloadManager->generateDownloadUrl($media));
+        return new Response($downloadManager->generateDownloadUrlForFile($media));
     }
 
     /**
@@ -98,9 +95,6 @@ class MediaController extends AbstractController
      */
     public function uploadImage(Media $media, Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
-        /**
-         * @var UploadedFile $image
-         */
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
@@ -119,7 +113,7 @@ class MediaController extends AbstractController
             return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
 
-        return new Response($downloadManager->generateDownloadUrl($media));
+        return new Response($downloadManager->generateDownloadUrlForFile($media));
     }
 
     protected function errorResponse(string $message): Response

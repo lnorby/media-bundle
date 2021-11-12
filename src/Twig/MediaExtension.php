@@ -35,7 +35,7 @@ final class MediaExtension extends AbstractExtension
         ];
     }
 
-    public function file($media): string
+    public function file($media, bool $friendly = false): string
     {
         if (!$media instanceof Media) {
             $media = $this->entityManager->find(Media::class, $media);
@@ -45,10 +45,10 @@ final class MediaExtension extends AbstractExtension
             return '';
         }
 
-        return $this->downloadManager->generateDownloadUrl($media) ?? '';
+        return $this->downloadManager->generateDownloadUrlForFile($media, $friendly);
     }
 
-    public function resizedImage($media, int $width, int $height): string
+    public function resizedImage($media, int $width, int $height, bool $friendly = false): string
     {
         if (!$media instanceof Media) {
             $media = $this->entityManager->find(Media::class, $media);
@@ -58,21 +58,10 @@ final class MediaExtension extends AbstractExtension
             return '';
         }
 
-        $downloadUrl = $this->downloadManager->generateDownloadUrl($media);
-
-        if (null === $downloadUrl) {
-            return '';
-        }
-
-        return sprintf(
-            '%s?w=%d&h=%d&m=r',
-            $downloadUrl,
-            $width,
-            $height
-        );
+        return $this->downloadManager->generateDownloadUrlForModifiedImage($media, $width, $height, 'r', $friendly);
     }
 
-    public function croppedImage($media, int $width, int $height): string
+    public function croppedImage($media, int $width, int $height, bool $friendly = false): string
     {
         if (!$media instanceof Media) {
             $media = $this->entityManager->find(Media::class, $media);
@@ -82,17 +71,6 @@ final class MediaExtension extends AbstractExtension
             return '';
         }
 
-        $downloadUrl = $this->downloadManager->generateDownloadUrl($media);
-
-        if (null === $downloadUrl) {
-            return '';
-        }
-
-        return sprintf(
-            '%s?w=%d&h=%d&m=c',
-            $downloadUrl,
-            $width,
-            $height
-        );
+        return $this->downloadManager->generateDownloadUrlForModifiedImage($media, $width, $height, 'c', $friendly);
     }
 }

@@ -3,12 +3,21 @@
 namespace Lnorby\MediaBundle;
 
 use Lnorby\MediaBundle\Entity\Media;
+use Lnorby\MediaBundle\Exception\CouldNotDownloadFile;
 use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Routing\RouterInterface;
 
 final class DownloadManager
 {
+    public const IMAGE_RESIZE = 'r';
+    public const IMAGE_CROP = 'c';
+
+    /**
+     * @var string
+     */
+    private $publicPath;
+
     /**
      * @var Storage
      */
@@ -19,58 +28,91 @@ final class DownloadManager
      */
     private $router;
 
-    public function __construct(Storage $storage, RouterInterface $router)
+    public function __construct(string $publicPath, Storage $storage, RouterInterface $router)
     {
+        $this->publicPath = $publicPath;
         $this->storage = $storage;
         $this->router = $router;
     }
 
-    public function generateDownloadUrl(Media $media): ?string
+    public function generateDownloadUrlForFile(Media $media, bool $friendly = false): string
     {
         if (!$media->isUploaded()) {
-            return null;
+            return '';
         }
 
-        return $this->router->generate(
-            '_media_download',
-            [
-                'id' => $media->getId(),
-                'originalName' => $media->getOriginalName(),
-            ]
-        );
+        if ($friendly) {
+            return $this->router->generate(
+                '_media_download',
+                [
+                    'id' => $media->getId(),
+                    'originalName' => $media->getOriginalName(),
+                ]
+            );
+        }
+
+        return sprintf('%s/%s', $this->publicPath, $media->getPath());
+    }
+
+    public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode, bool $friendly = false): string
+    {
+        if (!$media->isUploaded()) {
+            return '';
+        }
+
+        if ($friendly) {
+            return sprintf(
+                '%s?w=%d&h=%d&m=%s',
+                $this->router->generate(
+                    '_media_download',
+                    [
+                        'id' => $media->getId(),
+                        'originalName' => $media->getOriginalName(),
+                    ]
+                ),
+                $width,
+                $height,
+                $mode
+            );
+        }
+
+        try {
+            $path = $this->getModifiedImagePath($media, $width, $height, $mode);
+        } catch (CouldNotDownloadFile $e) {
+            return '';
+        }
+
+        return sprintf('%s/%s', $this->publicPath, $path);
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws CouldNotDownloadFile
      */
     public function downloadFile(Media $media): BinaryFileResponse
     {
         if (!$media->isUploaded()) {
-            throw new \RuntimeException('File not uploaded.');
+            throw new CouldNotDownloadFile();
         }
 
         if (!$this->storage->fileExists($media->getPath())) {
-            throw new \RuntimeException('File does not exist.');
+            throw new CouldNotDownloadFile();
         }
 
         return $this->createFileResponse($media->getPath());
     }
 
+    public function downloadModifiedImage(Media $media, int $width, int $height, string $mode): BinaryFileResponse
+    {
+        return $this->createFileResponse($this->getModifiedImagePath($media, $width, $height, $mode));
+    }
+
     /**
-     * @throws \RuntimeException
+     * @throws CouldNotDownloadFile
      */
-    public function downloadImage(Media $media, int $width, int $height, string $mode): BinaryFileResponse
+    private function getModifiedImagePath(Media $media, int $width, int $height, string $mode): string
     {
         if (!$media->isUploaded()) {
-            throw new \RuntimeException('File not uploaded.');
-        }
-
-        if (!$this->storage->fileExists($media->getPath())) {
-            throw new \RuntimeException('File does not exist.');
-        }
-
-        if (!$media->isImage()) {
-            throw new \RuntimeException('This media is not an image.');
+            throw new CouldNotDownloadFile();
         }
 
         $path = sprintf(
@@ -83,23 +125,28 @@ final class DownloadManager
             pathinfo($media->getPath(), PATHINFO_EXTENSION)
         );
 
-        if ($this->storage->fileExists($path)) {
-            return $this->createFileResponse($path);
+        if (!$this->storage->fileExists($path)) {
+            if (!$media->isImage()) {
+                throw new CouldNotDownloadFile();
+            }
+
+            try {
+                $imageManipulator = new ImageManipulator($this->storage->getRealPath($media->getPath()));
+            } catch (\RuntimeException $e) {
+                throw new CouldNotDownloadFile();
+            }
+
+            if (self::IMAGE_RESIZE === $mode) {
+                $imageManipulator->resize($width, $height);
+            } else {
+                $imageManipulator->crop($width, $height);
+            }
+
+            $modifiedImage = $imageManipulator->execute();
+            $this->storage->createFile($path, $modifiedImage);
         }
 
-        $imageManipulator = new ImageManipulator($this->storage->getRealPath($media->getPath()));
-
-        if ('r' === $mode) {
-            $imageManipulator->resize($width, $height);
-        } else {
-            $imageManipulator->crop($width, $height);
-        }
-
-        $resizedImage = $imageManipulator->execute();
-
-        $this->storage->createFile($path, $resizedImage);
-
-        return $this->createFileResponse($path);
+        return $path;
     }
 
     private function createFileResponse(string $path): BinaryFileResponse

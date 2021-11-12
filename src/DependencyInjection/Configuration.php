@@ -12,6 +12,7 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('lnorby_media');
         $treeBuilder->getRootNode()
             ->children()
+            ->scalarNode('public_path')->defaultValue('/media')->end()
             ->arrayNode('storage')
             ->addDefaultsIfNotSet()
             ->children()
