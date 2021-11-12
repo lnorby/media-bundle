@@ -75,12 +75,12 @@ final class DownloadManager
 
         $path = sprintf(
             '%s/%s.%dx%d%s.%s',
-            $media->getPathInfo()->getPath(),
-            $media->getPathInfo()->getFilename(),
+            pathinfo($media->getPath(), PATHINFO_DIRNAME),
+            pathinfo($media->getPath(), PATHINFO_FILENAME),
             $width,
             $height,
             $mode,
-            $media->getPathInfo()->getExtension()
+            pathinfo($media->getPath(), PATHINFO_EXTENSION)
         );
 
         if ($this->storage->fileExists($path)) {
