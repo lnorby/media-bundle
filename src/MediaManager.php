@@ -63,12 +63,11 @@ final class MediaManager
             return;
         }
 
-        $directory = $media->getPathInfo()->getPath();
         $pattern = sprintf(
             '%s/%s.*.%s',
-            $directory,
-            $media->getPathInfo()->getFilename(),
-            $media->getPathInfo()->getExtension()
+            pathinfo($media->getPath(), PATHINFO_DIRNAME),
+            pathinfo($media->getPath(), PATHINFO_FILENAME),
+            pathinfo($media->getPath(), PATHINFO_EXTENSION)
         );
 
         foreach ($this->storage->search($pattern) as $file) {
