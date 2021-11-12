@@ -135,9 +135,10 @@ final class UploadManager
         $uniqueFilename = str_replace('-', '', Uuid::v4()->toRfc4122());
 
         return sprintf(
-            '%s/%s/%s.%s',
+            '%s/%s/%s/%s.%s',
             substr($uniqueFilename, 0, 2),
             substr($uniqueFilename, 2, 2),
+            substr($uniqueFilename, 4, 2),
             $uniqueFilename,
             $extension
         );
