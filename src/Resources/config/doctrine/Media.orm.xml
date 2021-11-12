@@ -1,0 +1,15 @@
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="Lnorby\MediaBundle\Entity\Media">
+        <id name="id" type="integer">
+            <generator strategy="IDENTITY"/>
+        </id>
+
+        <field name="path" nullable="true"/>
+        <field name="originalName" nullable="true"/>
+        <field name="mimeType" nullable="true"/>
+        <field name="createdAt" type="datetime_immutable"/>
+    </entity>
+</doctrine-mapping>
