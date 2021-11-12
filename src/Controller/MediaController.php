@@ -33,9 +33,9 @@ class MediaController extends AbstractController
 
         $width = $request->query->getInt('w');
         $height = $request->query->getInt('h');
-        $mode = $request->query->getInt('m');
+        $mode = $request->query->get('m');
 
-        if (0 !== $width && 0 !== $height && in_array($mode, ['r', 'c'])) {
+        if (0 !== $width && 0 !== $height && null !== $mode && in_array($mode, ['r', 'c'])) {
             try {
                 return $downloadManager->downloadImage($media, $width, $height, $mode);
             } catch (\RuntimeException $e) {
