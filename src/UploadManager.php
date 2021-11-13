@@ -71,7 +71,7 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $originalName = strtolower($this->slugger->slug($file->getClientOriginalName()));
+        $originalName = $this->convertToSafeFilename($file->getClientOriginalName());
         $mimeType = $file->getMimeType();
 
         if ($media instanceof Media) {
@@ -123,7 +123,7 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $originalName = strtolower($this->slugger->slug($image->getClientOriginalName()));
+        $originalName = $this->convertToSafeFilename($image->getClientOriginalName());
         $mimeType = 'image/jpeg';
 
         if ($media instanceof Media) {
@@ -161,6 +161,15 @@ final class UploadManager
             substr($uniqueFilename, 4, 2),
             substr($uniqueFilename, 6),
             $extension
+        );
+    }
+
+    private function convertToSafeFilename(string $filename): string
+    {
+        return sprintf(
+            '%s.%s',
+            strtolower($this->slugger->slug(pathinfo($filename, PATHINFO_FILENAME))),
+            pathinfo($filename, PATHINFO_EXTENSION)
         );
     }
 }
