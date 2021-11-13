@@ -58,7 +58,13 @@ final class MediaExtension extends AbstractExtension
             return '';
         }
 
-        return $this->downloadManager->generateDownloadUrlForModifiedImage($media, $width, $height, 'r', $friendly);
+        return $this->downloadManager->generateDownloadUrlForModifiedImage(
+            $media,
+            $width,
+            $height,
+            DownloadManager::IMAGE_RESIZE,
+            $friendly
+        );
     }
 
     public function croppedImage($media, int $width, int $height, bool $friendly = false): string
@@ -71,6 +77,12 @@ final class MediaExtension extends AbstractExtension
             return '';
         }
 
-        return $this->downloadManager->generateDownloadUrlForModifiedImage($media, $width, $height, 'c', $friendly);
+        return $this->downloadManager->generateDownloadUrlForModifiedImage(
+            $media,
+            $width,
+            $height,
+            DownloadManager::IMAGE_CROP,
+            $friendly
+        );
     }
 }
