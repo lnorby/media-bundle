@@ -117,7 +117,7 @@ final class UploadManager
         }
 
         $originalName = $image->getClientOriginalName();
-        $mimeType = $image->getMimeType();
+        $mimeType = 'image/jpeg';
 
         if ($media instanceof Media) {
             $this->mediaManager->fileUploaded($media, $path, $originalName, $mimeType);
