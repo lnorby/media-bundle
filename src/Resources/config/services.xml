@@ -23,6 +23,7 @@
             <argument/>
             <argument type="service" id="Lnorby\MediaBundle\MediaManager"/>
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
+            <argument type="service" id="slugger"/>
         </service>
         <service id="Lnorby\MediaBundle\EventListener\MediaListener">
             <argument type="service" id="Lnorby\MediaBundle\MediaManager"/>

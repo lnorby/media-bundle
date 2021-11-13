@@ -10,6 +10,7 @@ use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
 use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
@@ -41,13 +42,19 @@ final class UploadManager
      */
     private $storage;
 
-    public function __construct(int $imageWidth, int $imageHeight, int $quality, MediaManager $mediaManager, Storage $storage)
+    /**
+     * @var SluggerInterface
+     */
+    private $slugger;
+
+    public function __construct(int $imageWidth, int $imageHeight, int $quality, MediaManager $mediaManager, Storage $storage, SluggerInterface $slugger)
     {
         $this->imageWidth = $imageWidth;
         $this->imageHeight = $imageHeight;
         $this->quality = $quality;
         $this->mediaManager = $mediaManager;
         $this->storage = $storage;
+        $this->slugger = $slugger;
     }
 
     /**
@@ -65,7 +72,7 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $originalName = $file->getClientOriginalName();
+        $originalName = strtolower($this->slugger->slug($file->getClientOriginalName()));
         $mimeType = $file->getMimeType();
 
         if ($media instanceof Media) {
@@ -117,7 +124,7 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $originalName = $image->getClientOriginalName();
+        $originalName = strtolower($this->slugger->slug($image->getClientOriginalName()));
         $mimeType = 'image/jpeg';
 
         if ($media instanceof Media) {
