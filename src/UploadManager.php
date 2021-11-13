@@ -56,16 +56,10 @@ final class UploadManager
     {
         $this->validateFile($file);
 
-        $fileContents = file_get_contents($file->getPathname());
-
-        if (false === $fileContents) {
-            throw new CouldNotUploadFile();
-        }
-
         $path = $this->generateUniqueFilenameWithPath($file->guessExtension());
 
         try {
-            $this->storage->createFile($path, $fileContents);
+            $this->storage->createFile($path, $file->getContent());
         } catch (\RuntimeException $e) {
             throw new CouldNotUploadFile();
         }
@@ -112,7 +106,7 @@ final class UploadManager
         $path = $this->generateUniqueFilenameWithPath('jpg');
 
         try {
-            $imageManipulator = new ImageManipulator(file_get_contents($image->getRealPath()));
+            $imageManipulator = new ImageManipulator($image->getContent());
             $imageManipulator->resize($this->imageWidth, $this->imageHeight);
             $imageManipulator->setQuality($this->quality);
             $imageManipulator->setFormat(ImageManipulator::FORMAT_JPEG);
