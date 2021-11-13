@@ -60,7 +60,7 @@ final class UploadManager
 
         try {
             $this->storage->createFile($path, $file->getContent());
-        } catch (\RuntimeException $e) {
+        } catch (\Exception $e) {
             throw new CouldNotUploadFile();
         }
 
