@@ -6,7 +6,6 @@ use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\CouldNotDownloadFile;
 use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\Routing\RouterInterface;
 
 final class DownloadManager
 {
@@ -23,16 +22,10 @@ final class DownloadManager
      */
     private $storage;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(string $publicPath, Storage $storage, RouterInterface $router)
+    public function __construct(string $publicPath, Storage $storage)
     {
         $this->publicPath = $publicPath;
         $this->storage = $storage;
-        $this->router = $router;
     }
 
     public function generateDownloadUrlForFile(Media $media, bool $friendly = false): string
@@ -42,13 +35,7 @@ final class DownloadManager
         }
 
         if ($friendly) {
-            return $this->router->generate(
-                '_media_download',
-                [
-                    'id' => $media->getId(),
-                    'originalName' => $media->getOriginalName(),
-                ]
-            );
+            return sprintf('/media/%d/%s', $media->getId(), $media->getOriginalName());
         }
 
         return $this->publicPath . '/' . $media->getPath();
@@ -62,14 +49,9 @@ final class DownloadManager
 
         if ($friendly) {
             return sprintf(
-                '%s?w=%d&h=%d&m=%s',
-                $this->router->generate(
-                    '_media_download',
-                    [
-                        'id' => $media->getId(),
-                        'originalName' => $media->getOriginalName(),
-                    ]
-                ),
+                '/media/%d/%s?w=%d&h=%d&m=%s',
+                $media->getId(),
+                $media->getOriginalName(),
                 $width,
                 $height,
                 $mode

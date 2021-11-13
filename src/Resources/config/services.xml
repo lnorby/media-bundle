@@ -16,7 +16,6 @@
         <service id="Lnorby\MediaBundle\DownloadManager">
             <argument/>
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
-            <argument type="service" id="router"/>
         </service>
         <service id="Lnorby\MediaBundle\UploadManager">
             <argument/>

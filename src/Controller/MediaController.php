@@ -17,13 +17,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-// TODO: protect with secret
 // TODO: translations
-
 class MediaController extends AbstractController
 {
     /**
-     * @Route("/{id}/{originalName<[^/]+>}", name="_media_download", methods={"GET"}, priority=-1)
+     * @Route("/media/{id}/{originalName<[^/]+>}", name="_media_download", methods={"GET"})
      */
     public function download(Media $media, string $originalName, Request $request, DownloadManager $downloadManager): Response
     {
@@ -51,7 +49,7 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="_media_new", methods={"POST"})
+     * @Route("/_media/new", name="_media_new", methods={"POST"})
      */
     public function new(MediaManager $mediaManager): Response
     {
@@ -61,7 +59,7 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/delete", name="_media_delete", methods={"GET"})
+     * @Route("/_media/{id}/delete", name="_media_delete", methods={"GET"})
      */
     public function delete(Media $media, MediaManager $mediaManager): Response
     {
@@ -71,7 +69,7 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/upload-file", name="_media_upload_file", methods={"POST"})
+     * @Route("/_media/{id}/upload-file", name="_media_upload_file", methods={"POST"})
      */
     public function uploadFile(Media $media, Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
@@ -91,7 +89,7 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/upload-image", name="_media_upload_image", methods={"POST"})
+     * @Route("/_media/{id}/upload-image", name="_media_upload_image", methods={"POST"})
      */
     public function uploadImage(Media $media, Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
