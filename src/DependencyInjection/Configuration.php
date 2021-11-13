@@ -27,7 +27,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('width')->defaultValue(1920)->end()
             ->scalarNode('height')->defaultValue(1920)->end()
-            ->scalarNode('quality')->defaultValue(70)->end()
+            ->scalarNode('quality')->defaultValue(80)->end()
             ->end()
             ->end();
 
