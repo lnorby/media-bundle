@@ -35,7 +35,7 @@ final class DownloadManager
         }
 
         if ($friendly) {
-            return sprintf('/media/%d/%s', $media->getId(), $media->getOriginalName());
+            return sprintf('/media/%d/%s', $media->getId(), $media->getName());
         }
 
         return $this->publicPath . '/' . $media->getPath();
@@ -51,7 +51,7 @@ final class DownloadManager
             return sprintf(
                 '/media/%d/%s?w=%d&h=%d&m=%s',
                 $media->getId(),
-                $media->getOriginalName(),
+                $media->getName(),
                 $width,
                 $height,
                 $mode

@@ -17,7 +17,7 @@ class Media
     /**
      * @var string|null
      */
-    private $originalName = null;
+    private $name = null;
 
     /**
      * @var string|null
@@ -34,10 +34,10 @@ class Media
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function uploaded(string $path, string $originalName, string $mimeType): void
+    public function uploaded(string $path, string $name, string $mimeType): void
     {
         $this->path = $path;
-        $this->originalName = $originalName;
+        $this->name = $name;
         $this->mimeType = $mimeType;
     }
 
@@ -51,9 +51,9 @@ class Media
         return $this->path;
     }
 
-    public function getOriginalName(): ?string
+    public function getName(): ?string
     {
-        return $this->originalName;
+        return $this->name;
     }
 
     public function getMimeType(): ?string

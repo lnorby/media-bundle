@@ -21,11 +21,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class MediaController extends AbstractController
 {
     /**
-     * @Route("/media/{id}/{originalName<[^/]+>}", name="_media_download", methods={"GET"})
+     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download", methods={"GET"})
      */
-    public function download(Media $media, string $originalName, Request $request, DownloadManager $downloadManager): Response
+    public function download(Media $media, string $name, Request $request, DownloadManager $downloadManager): Response
     {
-        if ($media->getOriginalName() !== $originalName) {
+        if ($media->getName() !== $name) {
             throw $this->createNotFoundException();
         }
 

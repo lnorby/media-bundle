@@ -71,13 +71,13 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $originalName = $this->convertToSafeFilename($file->getClientOriginalName());
+        $name = $this->convertToSafeFilename($file->getClientOriginalName(), $file->guessExtension());
         $mimeType = $file->getMimeType();
 
         if ($media instanceof Media) {
-            $this->mediaManager->fileUploaded($media, $path, $originalName, $mimeType);
+            $this->mediaManager->fileUploaded($media, $path, $name, $mimeType);
         } else {
-            $media = $this->mediaManager->createUploadedMedia($path, $originalName, $mimeType);
+            $media = $this->mediaManager->createUploadedMedia($path, $name, $mimeType);
         }
 
         return $media;
@@ -123,13 +123,13 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $originalName = $this->convertToSafeFilename($image->getClientOriginalName());
+        $name = $this->convertToSafeFilename($image->getClientOriginalName(), 'jpg');
         $mimeType = 'image/jpeg';
 
         if ($media instanceof Media) {
-            $this->mediaManager->fileUploaded($media, $path, $originalName, $mimeType);
+            $this->mediaManager->fileUploaded($media, $path, $name, $mimeType);
         } else {
-            $media = $this->mediaManager->createUploadedMedia($path, $originalName, $mimeType);
+            $media = $this->mediaManager->createUploadedMedia($path, $name, $mimeType);
         }
 
         return $media;
@@ -164,12 +164,12 @@ final class UploadManager
         );
     }
 
-    private function convertToSafeFilename(string $filename): string
+    private function convertToSafeFilename(string $originalFilename, string $extension): string
     {
         return sprintf(
             '%s.%s',
-            strtolower($this->slugger->slug(pathinfo($filename, PATHINFO_FILENAME))),
-            pathinfo($filename, PATHINFO_EXTENSION)
+            strtolower($this->slugger->slug(pathinfo($originalFilename, PATHINFO_FILENAME))),
+            $extension
         );
     }
 }
