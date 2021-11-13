@@ -9,11 +9,6 @@ interface Storage
      */
     public function createFile(string $file, string $content): void;
 
-    /**
-     * @throws \RuntimeException
-     */
-    public function overwriteFile(string $file, string $content): void;
-
     public function deleteFile(string $file): void;
 
     public function fileExists(string $file): bool;

@@ -10,7 +10,6 @@ use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
 use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
@@ -55,17 +54,7 @@ final class UploadManager
      */
     public function uploadFile(UploadedFile $file, ?Media $media = null): Media
     {
-        if (!$file->isValid()) {
-            switch ($file->getError()) {
-                case UPLOAD_ERR_INI_SIZE:
-                case UPLOAD_ERR_FORM_SIZE:
-                    throw new UploadSizeExceeded();
-                case UPLOAD_ERR_NO_FILE:
-                    throw new NoFile();
-                default:
-                    throw new CouldNotUploadFile();
-            }
-        }
+        $this->validateFile($file);
 
         $fileContents = file_get_contents($file->getPathname());
 
@@ -98,6 +87,8 @@ final class UploadManager
      */
     public function uploadImage(UploadedFile $image, ?Media $media = null, int $minWidth = 0, int $minHeight = 0): Media
     {
+        $this->validateFile($image);
+
         $validator = Validation::createValidator();
         $imageConstraints = new Image();
         $imageConstraints->detectCorrupted = true;
@@ -118,21 +109,50 @@ final class UploadManager
             throw new BadImageDimensions();
         }
 
-        $media = $this->uploadFile($image, $media);
+        $path = $this->generateUniqueFilenameWithPath('jpg');
 
-        $imageManipulator = new ImageManipulator($this->storage->getRealPath($media->getPath()));
-        $imageManipulator->resize($this->imageWidth, $this->imageHeight);
-        $imageManipulator->setQuality($this->quality);
-        $optimizedImage = $imageManipulator->execute();
+        try {
+            $imageManipulator = new ImageManipulator(file_get_contents($image->getRealPath()));
+            $imageManipulator->resize($this->imageWidth, $this->imageHeight);
+            $imageManipulator->setQuality($this->quality);
+            $imageManipulator->setFormat(ImageManipulator::FORMAT_JPEG);
+            $optimizedImage = $imageManipulator->execute();
 
-        $this->storage->overwriteFile($media->getPath(), $optimizedImage);
+            $this->storage->createFile($path, $optimizedImage);
+        } catch (\Exception $e) {
+            throw new CouldNotUploadFile();
+        }
+
+        $originalName = $image->getClientOriginalName();
+        $mimeType = $image->getMimeType();
+
+        if ($media instanceof Media) {
+            $this->mediaManager->fileUploaded($media, $path, $originalName, $mimeType);
+        } else {
+            $media = $this->mediaManager->createUploadedMedia($path, $originalName, $mimeType);
+        }
 
         return $media;
     }
 
+    private function validateFile(UploadedFile $file): void
+    {
+        if (!$file->isValid()) {
+            switch ($file->getError()) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    throw new UploadSizeExceeded();
+                case UPLOAD_ERR_NO_FILE:
+                    throw new NoFile();
+                default:
+                    throw new CouldNotUploadFile();
+            }
+        }
+    }
+
     private function generateUniqueFilenameWithPath(string $extension): string
     {
-        $uniqueFilename = str_replace('-', '', Uuid::v4()->toRfc4122());
+        $uniqueFilename = bin2hex(random_bytes(8));
 
         return sprintf(
             '%s/%s/%s/%s.%s',

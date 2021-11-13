@@ -13,11 +13,6 @@ final class ImageManipulator
     public const FORMAT_WEBP = 'webp';
 
     /**
-     * @var string
-     */
-    private $file;
-
-    /**
      * @var Image
      */
     private $image;
@@ -35,12 +30,10 @@ final class ImageManipulator
     /**
      * @throws \RuntimeException
      */
-    public function __construct(string $file)
+    public function __construct(string $source)
     {
-        $this->file = $file;
-
         try {
-            $this->image = ImageManagerStatic::make($file);
+            $this->image = ImageManagerStatic::make($source);
         } catch (NotReadableException $e) {
             throw new \RuntimeException('Image is not readable.', 0, $e);
         }

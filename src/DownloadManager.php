@@ -51,7 +51,7 @@ final class DownloadManager
             );
         }
 
-        return sprintf('%s/%s', $this->publicPath, $media->getPath());
+        return $this->publicPath . '/' . $media->getPath();
     }
 
     public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode, bool $friendly = false): string
@@ -82,7 +82,7 @@ final class DownloadManager
             return '';
         }
 
-        return sprintf('%s/%s', $this->publicPath, $path);
+        return $this->publicPath . '/' . $path;
     }
 
     /**

@@ -31,21 +31,6 @@ final class LocalStorage implements Storage
         }
     }
 
-    public function overwriteFile(string $file, string $content): void
-    {
-        if ('' === $file) {
-            throw new \InvalidArgumentException('No file specified.');
-        }
-
-        if (!$this->fileExists($file)) {
-            throw new \InvalidArgumentException('File not exists.');
-        }
-
-        if (!@file_put_contents($this->getRealPath($file), $content)) {
-            throw new \RuntimeException('Cannot overwrite file.');
-        }
-    }
-
     public function deleteFile(string $file): void
     {
         if ('' === $file) {
