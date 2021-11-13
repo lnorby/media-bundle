@@ -14,7 +14,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
-// TODO: original name url safe conversion
 final class UploadManager
 {
     /**
