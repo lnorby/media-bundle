@@ -85,7 +85,6 @@ final class UploadManager
 
         $validator = Validation::createValidator();
         $imageConstraints = new Image();
-        $imageConstraints->detectCorrupted = true;
 
         if (0 !== count($validator->validate($image, [$imageConstraints]))) {
             throw new InvalidFile();
