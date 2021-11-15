@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Storage\Storage;
 
-// TODO: konfigurálható legyen, hogy a valós fájlneveket használja-e a rendszer
 final class MediaManager
 {
     /**

@@ -5,6 +5,7 @@ namespace Lnorby\MediaBundle;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
+use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
@@ -61,6 +62,10 @@ final class UploadManager
      */
     public function uploadFile(UploadedFile $file, ?Media $media = null): Media
     {
+        if ($media instanceof Media && $media->isUploaded()) {
+            throw new FileAlreadyUploaded();
+        }
+
         $this->validateFile($file);
 
         $path = $this->generateUniqueFilenameWithPath($file->guessExtension());
@@ -88,6 +93,10 @@ final class UploadManager
      */
     public function uploadImage(UploadedFile $image, ?Media $media = null, int $minWidth = 0, int $minHeight = 0): Media
     {
+        if ($media instanceof Media && $media->isUploaded()) {
+            throw new FileAlreadyUploaded();
+        }
+
         $this->validateFile($image);
 
         $validator = Validation::createValidator();

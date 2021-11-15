@@ -7,6 +7,7 @@ use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
 use Lnorby\MediaBundle\Exception\CouldNotDownloadFile;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
+use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
@@ -81,6 +82,8 @@ class MediaController extends AbstractController
             return $this->errorResponse('Nem adott meg fájlt.');
         } catch (UploadSizeExceeded $e) {
             return $this->errorResponse('A fájlt nem sikerült feltölteni, mert túl nagy a mérete.');
+        } catch (FileAlreadyUploaded $e) {
+            return $this->errorResponse('A fájlt nem sikerült feltölteni.');
         } catch (CouldNotUploadFile $e) {
             return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
@@ -107,6 +110,8 @@ class MediaController extends AbstractController
             return $this->errorResponse(sprintf('A képnek legalább %d×%d pixel méretűnek kell lennie.', $minWidth, $minHeight));
         } catch (UploadSizeExceeded $e) {
             return $this->errorResponse('A képet nem sikerült feltölteni, mert túl nagy a mérete.');
+        } catch (FileAlreadyUploaded $e) {
+            return $this->errorResponse('A képet nem sikerült feltölteni.');
         } catch (CouldNotUploadFile $e) {
             return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
