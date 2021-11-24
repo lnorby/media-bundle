@@ -23,7 +23,7 @@ final class LnorbyMediaExtension extends Extension
         $definition = $container->getDefinition('Lnorby\MediaBundle\DownloadManager');
         $definition->replaceArgument(0, $config['public_path']);
 
-        $definition = $container->getDefinition('Lnorby\MediaBundle\UploadManager');
+        $definition = $container->getDefinition('Lnorby\MediaBundle\Uploader\UploadManager');
         $definition->replaceArgument(0, $config['storage']['image']['width']);
         $definition->replaceArgument(1, $config['storage']['image']['height']);
         $definition->replaceArgument(2, $config['storage']['image']['quality']);

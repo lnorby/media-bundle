@@ -11,7 +11,7 @@ use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
-use Lnorby\MediaBundle\UploadManager;
+use Lnorby\MediaBundle\Uploader\UploadManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

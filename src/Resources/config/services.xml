@@ -17,7 +17,7 @@
             <argument/>
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
         </service>
-        <service id="Lnorby\MediaBundle\UploadManager">
+        <service id="Lnorby\MediaBundle\Uploader\UploadManager">
             <argument/>
             <argument/>
             <argument/>
