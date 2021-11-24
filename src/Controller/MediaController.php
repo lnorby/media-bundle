@@ -67,7 +67,12 @@ class MediaController extends AbstractController
             return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
 
-        return new Response($downloadManager->generateDownloadUrlForFile($media));
+        return $this->json(
+            [
+                'id' => $media->getId(),
+                'url' => $downloadManager->generateDownloadUrlForFile($media),
+            ]
+        );
     }
 
     /**
@@ -95,7 +100,12 @@ class MediaController extends AbstractController
             return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
 
-        return new Response($downloadManager->generateDownloadUrlForFile($media));
+        return $this->json(
+            [
+                'id' => $media->getId(),
+                'url' => $downloadManager->generateDownloadUrlForFile($media),
+            ]
+        );
     }
 
     protected function errorResponse(string $message): Response
