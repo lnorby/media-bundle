@@ -10,35 +10,31 @@ class Media
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private $path = null;
+    private $path;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private $name = null;
+    private $name;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private $mimeType = null;
+    private $mimeType;
 
     /**
      * @var \DateTimeImmutable
      */
     private $createdAt;
 
-    public function __construct()
-    {
-        $this->createdAt = new \DateTimeImmutable();
-    }
-
-    public function uploaded(string $path, string $name, string $mimeType): void
+    public function __construct(string $path, string $name, string $mimeType)
     {
         $this->path = $path;
         $this->name = $name;
         $this->mimeType = $mimeType;
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): int
@@ -46,17 +42,17 @@ class Media
         return $this->id;
     }
 
-    public function getPath(): ?string
+    public function getPath(): string
     {
         return $this->path;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getMimeType(): ?string
+    public function getMimeType(): string
     {
         return $this->mimeType;
     }
@@ -64,10 +60,5 @@ class Media
     public function isImage(): bool
     {
         return strpos($this->mimeType, 'image/') === 0;
-    }
-
-    public function isUploaded(): bool
-    {
-        return null !== $this->path;
     }
 }

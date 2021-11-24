@@ -24,31 +24,14 @@ final class MediaManager
         $this->entityManager = $entityManager;
     }
 
-    public function createMedia(): Media
+    public function createMedia(string $path, string $originalName, string $mimeType): Media
     {
-        $media = new Media();
+        $media = new Media($path, $originalName, $mimeType);
 
         $this->entityManager->persist($media);
         $this->entityManager->flush();
 
         return $media;
-    }
-
-    public function createUploadedMedia(string $path, string $originalName, string $mimeType): Media
-    {
-        $media = new Media();
-        $media->uploaded($path, $originalName, $mimeType);
-
-        $this->entityManager->persist($media);
-        $this->entityManager->flush();
-
-        return $media;
-    }
-
-    public function fileUploaded(Media $media, string $path, string $originalName, string $mimeType): void
-    {
-        $media->uploaded($path, $originalName, $mimeType);
-        $this->entityManager->flush();
     }
 
     public function deleteMedia(Media $media): void
@@ -59,10 +42,6 @@ final class MediaManager
 
     public function deleteFiles(Media $media): void
     {
-        if (!$media->isUploaded()) {
-            return;
-        }
-
         $pattern = sprintf(
             '%s/%s.*.%s',
             pathinfo($media->getPath(), PATHINFO_DIRNAME),

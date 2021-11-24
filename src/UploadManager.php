@@ -5,7 +5,6 @@ namespace Lnorby\MediaBundle;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
-use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
@@ -15,6 +14,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
+// TODO: import file
 final class UploadManager
 {
     /**
@@ -60,12 +60,8 @@ final class UploadManager
     /**
      * @throws CouldNotUploadFile
      */
-    public function uploadFile(UploadedFile $file, ?Media $media = null): Media
+    public function uploadFile(UploadedFile $file): Media
     {
-        if ($media instanceof Media && $media->isUploaded()) {
-            throw new FileAlreadyUploaded();
-        }
-
         $this->validateFile($file);
 
         $path = $this->generateUniqueFilenameWithPath($file->guessExtension());
@@ -79,24 +75,14 @@ final class UploadManager
         $name = $this->convertToSafeFilename($file->getClientOriginalName(), $file->guessExtension());
         $mimeType = $file->getMimeType();
 
-        if ($media instanceof Media) {
-            $this->mediaManager->fileUploaded($media, $path, $name, $mimeType);
-        } else {
-            $media = $this->mediaManager->createUploadedMedia($path, $name, $mimeType);
-        }
-
-        return $media;
+        return $this->mediaManager->createMedia($path, $name, $mimeType);
     }
 
     /**
      * @throws CouldNotUploadFile
      */
-    public function uploadImage(UploadedFile $image, ?Media $media = null, int $minWidth = 0, int $minHeight = 0): Media
+    public function uploadImage(UploadedFile $image, int $minWidth = 0, int $minHeight = 0): Media
     {
-        if ($media instanceof Media && $media->isUploaded()) {
-            throw new FileAlreadyUploaded();
-        }
-
         $this->validateFile($image);
 
         $validator = Validation::createValidator();
@@ -135,13 +121,7 @@ final class UploadManager
         $name = $this->convertToSafeFilename($image->getClientOriginalName(), 'jpg');
         $mimeType = 'image/jpeg';
 
-        if ($media instanceof Media) {
-            $this->mediaManager->fileUploaded($media, $path, $name, $mimeType);
-        } else {
-            $media = $this->mediaManager->createUploadedMedia($path, $name, $mimeType);
-        }
-
-        return $media;
+        return $this->mediaManager->createMedia($path, $name, $mimeType);
     }
 
     private function validateFile(UploadedFile $file): void

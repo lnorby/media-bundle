@@ -11,7 +11,6 @@ use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
-use Lnorby\MediaBundle\MediaManager;
 use Lnorby\MediaBundle\UploadManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,34 +49,14 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @Route("/_media/new", name="_media_new", methods={"POST"})
+     * @Route("/_media/upload-file", name="_media_upload_file", methods={"POST"})
      */
-    public function new(MediaManager $mediaManager): Response
-    {
-        $media = $mediaManager->createMedia();
-
-        return new Response($media->getId());
-    }
-
-    /**
-     * @Route("/_media/{id}/delete", name="_media_delete", methods={"GET"})
-     */
-    public function delete(Media $media, MediaManager $mediaManager): Response
-    {
-        $mediaManager->deleteMedia($media);
-
-        return new Response();
-    }
-
-    /**
-     * @Route("/_media/{id}/upload-file", name="_media_upload_file", methods={"POST"})
-     */
-    public function uploadFile(Media $media, Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadFile(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
         $file = $request->files->get('file');
 
         try {
-            $uploadManager->uploadFile($file, $media);
+            $media = $uploadManager->uploadFile($file);
         } catch (NoFile $e) {
             return $this->errorResponse('Nem adott meg fájlt.');
         } catch (UploadSizeExceeded $e) {
@@ -92,16 +71,16 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @Route("/_media/{id}/upload-image", name="_media_upload_image", methods={"POST"})
+     * @Route("/_media/upload-image", name="_media_upload_image", methods={"POST"})
      */
-    public function uploadImage(Media $media, Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadImage(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
 
         try {
-            $uploadManager->uploadImage($image, $media, $minWidth, $minHeight);
+            $media = $uploadManager->uploadImage($image, $minWidth, $minHeight);
         } catch (NoFile $e) {
             return $this->errorResponse('Nem adott meg képet.');
         } catch (InvalidFile $e) {

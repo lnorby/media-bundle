@@ -7,9 +7,9 @@
             <generator strategy="IDENTITY"/>
         </id>
 
-        <field name="path" nullable="true"/>
-        <field name="name" nullable="true"/>
-        <field name="mimeType" nullable="true"/>
+        <field name="path"/>
+        <field name="name"/>
+        <field name="mimeType"/>
         <field name="createdAt" type="datetime_immutable"/>
     </entity>
 </doctrine-mapping>

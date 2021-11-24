@@ -30,10 +30,6 @@ final class DownloadManager
 
     public function generateDownloadUrlForFile(Media $media, bool $friendly = false): string
     {
-        if (!$media->isUploaded()) {
-            return '';
-        }
-
         if ($friendly) {
             return sprintf('/media/%d/%s', $media->getId(), $media->getName());
         }
@@ -43,10 +39,6 @@ final class DownloadManager
 
     public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode, bool $friendly = false): string
     {
-        if (!$media->isUploaded()) {
-            return '';
-        }
-
         if ($friendly) {
             return sprintf(
                 '/media/%d/%s?w=%d&h=%d&m=%s',
@@ -72,10 +64,6 @@ final class DownloadManager
      */
     public function downloadFile(Media $media): BinaryFileResponse
     {
-        if (!$media->isUploaded()) {
-            throw new CouldNotDownloadFile();
-        }
-
         if (!$this->storage->fileExists($media->getPath())) {
             throw new CouldNotDownloadFile();
         }
@@ -93,10 +81,6 @@ final class DownloadManager
      */
     private function getModifiedImagePath(Media $media, int $width, int $height, string $mode): string
     {
-        if (!$media->isUploaded()) {
-            throw new CouldNotDownloadFile();
-        }
-
         $path = sprintf(
             '%s/%s.%dx%d%s.%s',
             pathinfo($media->getPath(), PATHINFO_DIRNAME),
