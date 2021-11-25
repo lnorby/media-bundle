@@ -1,0 +1,23 @@
+{% block image_uploader_widget %}
+    {%- set attr = attr|merge({'class': 'image-uploader js-image-uploader', 'data-index': form.children|length, 'data-sortable': sortable, 'data-min-height': min_height, 'data-min-width': min_width, 'data-limit': limit - form.children|length}) -%}
+    <div {{ block('widget_container_attributes') }}>
+        <template>
+            {{ form_widget(prototype) }}
+        </template>
+        <label class="image-uploader__file-picker">
+            <input type="file" class="js-image-uploader-file-picker" accept="image/*" {{ limit > 1 ? 'multiple' }}>
+        </label>
+        {%- for child in form -%}
+            {{- form_widget(child) -}}
+        {%- endfor -%}
+    </div>
+{% endblock %}
+
+{% block uploaded_image_widget %}
+    <div class="image-uploader__uploaded-image js-uploaded-image" style="background-image: url('{{ media_cropped_image(form.mediaId.vars.value, 200, 200) }}');">
+        <button type="button" class="image-uploader__remove-button js-uploaded-image-remove-button">Törlés</button>
+        {%- for child in form -%}
+            {{- form_widget(child) -}}
+        {%- endfor -%}
+    </div>
+{% endblock %}
