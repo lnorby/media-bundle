@@ -10,7 +10,8 @@ Encore
     .addEntry('uploader', './assets/uploader.js')
     .disableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
-    // .enableVersioning(Encore.isProduction())
+    .enableVersioning(true)
+    .setManifestKeyPrefix('bundles/media')
     .configureBabel((config) => {
         config.plugins.push('@babel/plugin-proposal-class-properties');
     })
