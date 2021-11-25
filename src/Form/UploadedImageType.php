@@ -24,24 +24,8 @@ final class UploadedImageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(
-                'media',
-                HiddenType::class,
-                [
-                    'attr' => [
-                        'class' => 'js-uploaded-image-media-id',
-                    ],
-                ]
-            )
-            ->add(
-                'position',
-                HiddenType::class,
-                [
-                    'attr' => [
-                        'class' => 'js-uploaded-image-position',
-                    ],
-                ]
-            );
+            ->add('media', HiddenType::class)
+            ->add('position', HiddenType::class);
 
         $builder->get('media')->addModelTransformer($this->transformer);
     }
