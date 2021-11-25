@@ -11,7 +11,7 @@ Encore
     .disableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
     .enableVersioning(true)
-    .setManifestKeyPrefix('bundles/media')
+    // .setManifestKeyPrefix('bundles/media')
     .configureBabel((config) => {
         config.plugins.push('@babel/plugin-proposal-class-properties');
     })
