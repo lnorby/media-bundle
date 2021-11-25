@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block uploaded_image_widget %}
-    <div class="image-uploader__uploaded-image js-uploaded-image" style="background-image: url('{{ media_cropped_image(form.mediaId.vars.value, 250, 250) }}');">
+    <div class="image-uploader__uploaded-image js-uploaded-image" style="background-image: url('{{ media_cropped_image(form.media.vars.value, 250, 250) }}');">
         <button type="button" class="image-uploader__remove-button js-uploaded-image-remove-button">Törlés</button>
         {%- for child in form -%}
             {{- form_widget(child) -}}
