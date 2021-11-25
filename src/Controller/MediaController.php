@@ -70,6 +70,7 @@ class MediaController extends AbstractController
         return $this->json(
             [
                 'id' => $media->getId(),
+                'name' => $media->getName(),
                 'url' => $downloadManager->generateDownloadUrlForFile($media),
             ]
         );

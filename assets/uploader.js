@@ -1,6 +1,8 @@
 import axios from 'axios';
 import Sortable from 'sortablejs';
 
+const _form = document.querySelector('.js-form');
+
 function increaseDataAttribute(_element, attribute) {
     attribute = `data-${attribute}`;
 
@@ -22,7 +24,6 @@ function decreaseDataAttribute(_element, attribute) {
 }
 
 function uploadImage(_uploader, file) {
-    const _form = _uploader.closest('.js-form');
     const _image = _uploader.querySelector('template').content.firstElementChild.cloneNode(true);
     _image.innerHTML = _image.innerHTML.replaceAll('__name__', _uploader.getAttribute('data-index'));
     _image.classList.add('is-uploading');
@@ -70,23 +71,46 @@ function updateImagePositions(_uploader) {
     });
 }
 
+function uploadFile(_uploader, file) {
+    _uploader.classList.add('is-uploading');
+
+    increaseDataAttribute(_form, 'uploads');
+
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+
+    axios
+        .post(`/_media/upload-file`, formData)
+        .then((response) => {
+            _uploader.querySelector('.js-file-uploader-media-id').value = response.data.id;
+        })
+        .catch((error) => {
+            alert(error.response.data);
+        })
+        .then(() => {
+            _uploader.classList.remove('is-uploading');
+            decreaseDataAttribute(_form, 'uploads');
+        });
+}
+
 document.addEventListener('change', (event) => {
-    if (!event.target.classList.contains('js-image-uploader-file-picker')) {
-        return;
-    }
+    if (event.target.classList.contains('js-image-uploader-file-picker')) {
+        const _filePicker = event.target;
+        const _uploader = _filePicker.closest('.js-image-uploader');
 
-    const _filePicker = event.target;
-    const _uploader = _filePicker.closest('.js-image-uploader');
+        for (let i = 0; i < _filePicker.files.length; i += 1) {
+            if (0 === parseInt(_uploader.getAttribute('data-limit'))) {
+                break;
+            }
 
-    for (let i = 0; i < _filePicker.files.length; i += 1) {
-        if (0 === parseInt(_uploader.getAttribute('data-limit'))) {
-            break;
+            uploadImage(_uploader, _filePicker.files[i]);
         }
 
-        uploadImage(_uploader, _filePicker.files[i]);
+        _filePicker.value = '';
+    } else if (event.target.classList.contains('js-file-uploader-file-picker')) {
+        const _filePicker = event.target;
+        uploadFile(_filePicker.closest('.js-file-uploader'), _filePicker.files[0]);
     }
-
-    _filePicker.value = '';
 });
 
 document.addEventListener('click', (event) => {
@@ -105,10 +129,8 @@ document.querySelectorAll('.js-image-uploader[data-sortable]').forEach((_uploade
     });
 });
 
-// TODO
-// _form.addEventListener('submit', (event) => {
-//     if (_form.hasAttribute('data-uploads') && parseInt(_form.getAttribute('data-uploads')) > 0) {
-//         event.preventDefault();
-//         alert('');
-//     }
-// });
+_form.addEventListener('submit', (event) => {
+    if (_form.hasAttribute('data-uploads') && parseInt(_form.getAttribute('data-uploads')) > 0) {
+        event.preventDefault();
+    }
+});
