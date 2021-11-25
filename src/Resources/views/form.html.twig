@@ -21,3 +21,8 @@
         {%- endfor -%}
     </div>
 {% endblock %}
+
+{% block file_uploader_widget %}
+    {{ form_widget(form) }}
+{% endblock %}
+

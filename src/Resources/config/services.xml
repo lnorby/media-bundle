@@ -34,5 +34,14 @@
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <tag name="twig.extension"/>
         </service>
+        <service id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer">
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+        </service>
+        <service id="Lnorby\MediaBundle\Form\FileUploaderType">
+            <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>
+        </service>
+        <service id="Lnorby\MediaBundle\Form\UploadedImageType">
+            <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>
+        </service>
     </services>
 </container>
