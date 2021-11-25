@@ -1,0 +1,9 @@
+{
+  "entrypoints": {
+    "uploader": {
+      "js": [
+        "/uploader.js"
+      ]
+    }
+  }
+}

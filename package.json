@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "axios": "^0.24.0",
+    "sortablejs": "^1.14.0"
+  },
+  "devDependencies": {
+    "@symfony/webpack-encore": "^1.6.1",
+    "core-js": "^3.19.1"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%"
+  ]
+}
