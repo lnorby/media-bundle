@@ -23,9 +23,10 @@
 {% endblock %}
 
 {% block file_uploader_widget %}
-    <div class="js-file-uploader">
-        <input type="file" class="js-file-uploader-file-picker">
-        {{ form_widget(form) }}
-    </div>
+    {#    {%- set attr = attr|merge({'class': 'file-uploader js-file-uploader'}) -%}#}
+    {#    <div {{ block('widget_container_attributes') }}>#}
+    {#        <input type="file" class="js-file-uploader-file-picker">#}
+    {#        {{ form_widget(form) }}#}
+    {#    </div>#}
 {% endblock %}
 

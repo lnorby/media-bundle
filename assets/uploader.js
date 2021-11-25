@@ -110,6 +110,7 @@ document.addEventListener('change', (event) => {
     } else if (event.target.classList.contains('js-file-uploader-file-picker')) {
         const _filePicker = event.target;
         uploadFile(_filePicker.closest('.js-file-uploader'), _filePicker.files[0]);
+        _filePicker.value = '';
     }
 });
 
