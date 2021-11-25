@@ -39,9 +39,11 @@
         </service>
         <service id="Lnorby\MediaBundle\Form\FileUploaderType">
             <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>
+            <tag name="form.type"/>
         </service>
         <service id="Lnorby\MediaBundle\Form\UploadedImageType">
             <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>
+            <tag name="form.type"/>
         </service>
     </services>
 </container>
