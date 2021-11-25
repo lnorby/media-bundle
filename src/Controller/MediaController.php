@@ -103,7 +103,12 @@ class MediaController extends AbstractController
         return $this->json(
             [
                 'id' => $media->getId(),
-                'url' => $downloadManager->generateDownloadUrlForFile($media),
+                'url' => $downloadManager->generateDownloadUrlForModifiedImage(
+                    $media,
+                    250,
+                    250,
+                    DownloadManager::IMAGE_CROP
+                ),
             ]
         );
     }
