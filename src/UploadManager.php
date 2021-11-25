@@ -1,6 +1,6 @@
 <?php
 
-namespace Lnorby\MediaBundle\Uploader;
+namespace Lnorby\MediaBundle;
 
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
@@ -8,8 +8,6 @@ use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
-use Lnorby\MediaBundle\ImageManipulator;
-use Lnorby\MediaBundle\MediaManager;
 use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;

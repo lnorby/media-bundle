@@ -1,6 +1,6 @@
 <?php
 
-namespace Lnorby\MediaBundle\Uploader;
+namespace Lnorby\MediaBundle\Form\Dto;
 
 final class UploadedImageDto
 {

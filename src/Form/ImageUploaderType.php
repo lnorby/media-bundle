@@ -1,6 +1,6 @@
 <?php
 
-namespace Lnorby\MediaBundle\Uploader;
+namespace Lnorby\MediaBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;

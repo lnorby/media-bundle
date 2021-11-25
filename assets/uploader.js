@@ -105,6 +105,7 @@ document.querySelectorAll('.js-image-uploader[data-sortable]').forEach((_uploade
     });
 });
 
+// TODO
 // _form.addEventListener('submit', (event) => {
 //     if (_form.hasAttribute('data-uploads') && parseInt(_form.getAttribute('data-uploads')) > 0) {
 //         event.preventDefault();

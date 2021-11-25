@@ -1,7 +1,8 @@
 <?php
 
-namespace Lnorby\MediaBundle\Uploader;
+namespace Lnorby\MediaBundle\Form;
 
+use Lnorby\MediaBundle\Form\Dto\UploadedImageDto;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
