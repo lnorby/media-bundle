@@ -2,7 +2,7 @@
   "entrypoints": {
     "uploader": {
       "js": [
-        "/uploader.580d7162.js"
+        "/uploader.js"
       ]
     }
   }

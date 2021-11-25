@@ -10,8 +10,7 @@ Encore
     .addEntry('uploader', './assets/uploader.js')
     .disableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
-    .enableVersioning(true)
-    .setManifestKeyPrefix('bundles/lnorbymedia')
+    .enableVersioning(false)
     .configureBabel((config) => {
         config.plugins.push('@babel/plugin-proposal-class-properties');
     })
