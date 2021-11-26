@@ -26,7 +26,7 @@
         <label class="file-uploader__file-picker">
             <input type="file" class="js-file-uploader-file-picker">
         </label>
-        <a href="{{ file_path is not empty ? media_file(form.vars.data) }}" class="file-uploader__uploaded-file js-file-uploader-uploaded-file" target="_blank">{{ file_name }}</a>
+        <a href="{{ file_path is not empty ? media_file(form.vars.data) }}" class="file-uploader__uploaded-file js-file-uploader-uploaded-file" download="{{ file_name }}">{{ file_name }}</a>
         <button type="button" class="file-uploader__delete-button js-file-uploader-delete-button">törlés</button>
         {{ form_widget(form, {'attr': {'class': 'file-uploader__media-id-input js-file-uploader-media-id'}}) }}
     </div>
