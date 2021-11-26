@@ -6,6 +6,8 @@ use Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 final class FileUploaderType extends AbstractType
 {
@@ -22,6 +24,11 @@ final class FileUploaderType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer($this->transformer);
+    }
+
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        dump($form->getData());
     }
 
     public function getParent()
