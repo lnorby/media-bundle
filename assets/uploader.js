@@ -82,8 +82,14 @@ function uploadFile(_uploader, file) {
     axios
         .post(`/_media/upload-file`, formData)
         .then((response) => {
-            _uploader.classList.add('is-uploaded');
             _uploader.querySelector('.js-file-uploader-media-id').value = response.data.id;
+
+            const _uploadedFile = _uploader.querySelector('.js-file-uploader-uploaded-file');
+            _uploadedFile.setAttribute('href', response.data.url);
+            _uploadedFile.setAttribute('download', response.data.name);
+            _uploadedFile.innerText = response.data.name;
+
+            _uploader.classList.add('is-uploaded');
         })
         .catch((error) => {
             alert(error.response.data);
@@ -92,6 +98,17 @@ function uploadFile(_uploader, file) {
             _uploader.classList.remove('is-uploading');
             decreaseDataAttribute(_form, 'uploads');
         });
+}
+
+function deleteFile(_uploader) {
+    _uploader.querySelector('.js-file-uploader-media-id').value = '';
+
+    const _uploadedFile = _uploader.querySelector('.js-file-uploader-uploaded-file');
+    _uploadedFile.setAttribute('href', '');
+    _uploadedFile.setAttribute('download', '');
+    _uploadedFile.innerText = '';
+
+    _uploader.classList.remove('is-uploaded');
 }
 
 document.addEventListener('change', (event) => {
@@ -118,6 +135,10 @@ document.addEventListener('change', (event) => {
 document.addEventListener('click', (event) => {
     if (event.target.classList.contains('js-uploaded-image-remove-button')) {
         removeImage(event.target.closest('.js-image-uploader'), event.target.closest('.js-uploaded-image'));
+    }
+
+    if (event.target.classList.contains('js-file-uploader-delete-button')) {
+        deleteFile(event.target.closest('.js-file-uploader'));
     }
 });
 
