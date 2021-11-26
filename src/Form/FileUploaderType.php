@@ -2,6 +2,7 @@
 
 namespace Lnorby\MediaBundle\Form;
 
+use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,7 +29,13 @@ final class FileUploaderType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        dump($form->getData()->getPath());
+        /**
+         * @var Media|null $media
+         */
+        $media = $form->getData();
+
+        $view->vars['file_name'] = $media instanceof Media ? $media->getName() : '';
+        $view->vars['file_path'] = $media instanceof Media ? $media->getPath() : '';
     }
 
     public function getParent()

@@ -82,6 +82,7 @@ function uploadFile(_uploader, file) {
     axios
         .post(`/_media/upload-file`, formData)
         .then((response) => {
+            _uploader.classList.add('is-uploaded');
             _uploader.querySelector('.js-file-uploader-media-id').value = response.data.id;
         })
         .catch((error) => {
