@@ -28,7 +28,7 @@ final class FileUploaderType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        dump($form->getData());
+        dump($form->getData()->getPath());
     }
 
     public function getParent()
