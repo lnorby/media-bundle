@@ -12,6 +12,7 @@ final class ImageUploaderType extends AbstractType
 {
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        $view->vars['file_picker_label'] = $options['file_picker_label'];
         $view->vars['limit'] = $options['limit'];
         $view->vars['min_height'] = $options['min_height'];
         $view->vars['min_width'] = $options['min_width'];
@@ -25,6 +26,7 @@ final class ImageUploaderType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'entry_type' => UploadedImageType::class,
+                'file_picker_label' => 'Fénykép hozzáadása',
                 'min_height' => 250,
                 'min_width' => 250,
                 'sortable' => false,

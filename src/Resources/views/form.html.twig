@@ -6,10 +6,11 @@
         </template>
         <label class="image-uploader__file-picker">
             <input type="file" class="js-image-uploader-file-picker" accept="image/*" {{ limit > 1 ? 'multiple' }}>
+            <span>{{ file_picker_label }}</span>
         </label>
-        {%- for child in form -%}
-            {{- form_widget(child) -}}
-        {%- endfor -%}
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
     </div>
 {% endblock %}
 
