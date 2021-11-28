@@ -19,7 +19,7 @@
             {{ form_widget(prototype) }}
         </template>
         <label class="image-uploader__file-picker">
-            <input type="file" class="js-multiple-image-uploader-file-picker" accept="image/*" {{ limit > 1 ? 'multiple' }}>
+            <input type="file" class="js-image-uploader-file-picker" accept="image/*" {{ limit > 1 ? 'multiple' }}>
             <span>{{ file_picker_label }}</span>
         </label>
         {% for child in form %}

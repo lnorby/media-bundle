@@ -123,7 +123,7 @@ function removeFile(_uploader) {
 }
 
 document.addEventListener('change', (event) => {
-    if (event.target.classList.contains('js-multiple-image-uploader-file-picker')) {
+    if (event.target.classList.contains('js-image-uploader-file-picker')) {
         const _filePicker = event.target;
         const _uploader = _filePicker.closest('.js-image-uploader');
 
@@ -135,10 +135,6 @@ document.addEventListener('change', (event) => {
             uploadImage(_uploader, _filePicker.files[i]);
         }
 
-        _filePicker.value = '';
-    } else if (event.target.classList.contains('js-image-uploader-file-picker')) {
-        const _filePicker = event.target;
-        uploadImage(_filePicker.closest('.js-image-uploader'), _filePicker.files[0]);
         _filePicker.value = '';
     } else if (event.target.classList.contains('js-file-uploader-file-picker')) {
         const _filePicker = event.target;
