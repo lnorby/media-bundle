@@ -23,17 +23,23 @@ function decreaseDataAttribute(_element, attribute) {
     }
 }
 
-function uploadImage(_uploader, file) {
-    const _image = _uploader.querySelector('template').content.firstElementChild.cloneNode(true);
-    _image.innerHTML = _image.innerHTML.replaceAll('__name__', _uploader.getAttribute('data-index'));
+function uploadImage(_uploader, file, mode) {
+    let _image;
+
+    if ('multiple' === mode) {
+        _image = _uploader.querySelector('template').content.firstElementChild.cloneNode(true);
+        _image.innerHTML = _image.innerHTML.replaceAll('__name__', _uploader.getAttribute('data-index'));
+        _uploader.appendChild(_image);
+
+        updateImagePositions(_uploader);
+        increaseDataAttribute(_uploader, 'index');
+    } else {
+        _image = _uploader.querySelector('.js-uploaded-image');
+    }
+
     _image.classList.add('is-uploading');
-    _uploader.appendChild(_image);
-
-    updateImagePositions(_uploader);
-
-    increaseDataAttribute(_form, 'uploads');
-    increaseDataAttribute(_uploader, 'index');
     decreaseDataAttribute(_uploader, 'limit');
+    increaseDataAttribute(_form, 'uploads');
 
     const formData = new FormData();
     formData.append('image', file, file.name);
@@ -57,10 +63,15 @@ function uploadImage(_uploader, file) {
 }
 
 function removeImage(_uploader, _image) {
-    _image.parentNode.removeChild(_image);
-    increaseDataAttribute(_uploader, 'limit');
+    if (_uploader.classList.contains('js-multiple-image-uploader')) {
+        _image.parentNode.removeChild(_image);
+        updateImagePositions(_uploader);
+    } else {
+        _image.style.backgroundImage = '';
+        _image.querySelector('.js-uploaded-image-media-id').value = '';
+    }
 
-    updateImagePositions(_uploader);
+    increaseDataAttribute(_uploader, 'limit');
 }
 
 function updateImagePositions(_uploader) {
@@ -100,7 +111,7 @@ function uploadFile(_uploader, file) {
         });
 }
 
-function deleteFile(_uploader) {
+function removeFile(_uploader) {
     _uploader.querySelector('.js-file-uploader-media-id').value = '';
 
     const _uploadedFile = _uploader.querySelector('.js-file-uploader-uploaded-file');
@@ -112,18 +123,22 @@ function deleteFile(_uploader) {
 }
 
 document.addEventListener('change', (event) => {
-    if (event.target.classList.contains('js-image-uploader-file-picker')) {
+    if (event.target.classList.contains('js-multiple-image-uploader-file-picker')) {
         const _filePicker = event.target;
-        const _uploader = _filePicker.closest('.js-image-uploader');
+        const _uploader = _filePicker.closest('.js-multiple-image-uploader');
 
         for (let i = 0; i < _filePicker.files.length; i += 1) {
             if (0 === parseInt(_uploader.getAttribute('data-limit'))) {
                 break;
             }
 
-            uploadImage(_uploader, _filePicker.files[i]);
+            uploadImage(_uploader, _filePicker.files[i], 'multiple');
         }
 
+        _filePicker.value = '';
+    } else if (event.target.classList.contains('js-image-uploader-file-picker')) {
+        const _filePicker = event.target;
+        uploadImage(_filePicker.closest('.js-image-uploader'), _filePicker.files[0], 'single');
         _filePicker.value = '';
     } else if (event.target.classList.contains('js-file-uploader-file-picker')) {
         const _filePicker = event.target;
@@ -137,12 +152,12 @@ document.addEventListener('click', (event) => {
         removeImage(event.target.closest('.js-image-uploader'), event.target.closest('.js-uploaded-image'));
     }
 
-    if (event.target.classList.contains('js-file-uploader-delete-button')) {
-        deleteFile(event.target.closest('.js-file-uploader'));
+    if (event.target.classList.contains('js-file-uploader-remove-button')) {
+        removeFile(event.target.closest('.js-file-uploader'));
     }
 });
 
-document.querySelectorAll('.js-image-uploader[data-sortable]').forEach((_uploader) => {
+document.querySelectorAll('.js-multiple-image-uploader[data-sortable]').forEach((_uploader) => {
     Sortable.create(_uploader, {
         draggable: '.js-uploaded-image',
         filter: '.js-uploaded-image-remove-button',
