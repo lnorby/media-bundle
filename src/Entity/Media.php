@@ -24,17 +24,11 @@ class Media
      */
     private $mimeType;
 
-    /**
-     * @var \DateTimeImmutable
-     */
-    private $createdAt;
-
     public function __construct(string $path, string $name, string $mimeType)
     {
         $this->path = $path;
         $this->name = $name;
         $this->mimeType = $mimeType;
-        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): int
