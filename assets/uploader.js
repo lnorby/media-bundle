@@ -23,10 +23,10 @@ function decreaseDataAttribute(_element, attribute) {
     }
 }
 
-function uploadImage(_uploader, file, mode) {
+function uploadImage(_uploader, file) {
     let _image;
 
-    if ('multiple' === mode) {
+    if (_uploader.classList.contains('js-multiple-image-uploader')) {
         _image = _uploader.querySelector('template').content.firstElementChild.cloneNode(true);
         _image.innerHTML = _image.innerHTML.replaceAll('__name__', _uploader.getAttribute('data-index'));
         _uploader.appendChild(_image);
@@ -125,20 +125,20 @@ function removeFile(_uploader) {
 document.addEventListener('change', (event) => {
     if (event.target.classList.contains('js-multiple-image-uploader-file-picker')) {
         const _filePicker = event.target;
-        const _uploader = _filePicker.closest('.js-multiple-image-uploader');
+        const _uploader = _filePicker.closest('.js-image-uploader');
 
         for (let i = 0; i < _filePicker.files.length; i += 1) {
             if (0 === parseInt(_uploader.getAttribute('data-limit'))) {
                 break;
             }
 
-            uploadImage(_uploader, _filePicker.files[i], 'multiple');
+            uploadImage(_uploader, _filePicker.files[i]);
         }
 
         _filePicker.value = '';
     } else if (event.target.classList.contains('js-image-uploader-file-picker')) {
         const _filePicker = event.target;
-        uploadImage(_filePicker.closest('.js-image-uploader'), _filePicker.files[0], 'single');
+        uploadImage(_filePicker.closest('.js-image-uploader'), _filePicker.files[0]);
         _filePicker.value = '';
     } else if (event.target.classList.contains('js-file-uploader-file-picker')) {
         const _filePicker = event.target;

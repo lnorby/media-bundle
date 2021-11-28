@@ -1,5 +1,5 @@
 {% block image_uploader_widget %}
-    <div class="image-uploader image-uploader--single js-image-uploader" data-min-height="{{ min_height }}" data-min-width="{{ min_width }}" data-limit="{{ image_path is empty ? 1 : 0 }}">
+    <div class="image-uploader image-uploader--single js-image-uploader js-single-image-uploader" data-min-height="{{ min_height }}" data-min-width="{{ min_width }}" data-limit="{{ image_path is empty ? 1 : 0 }}">
         <label class="image-uploader__file-picker">
             <input type="file" class="js-image-uploader-file-picker" accept="image/*">
             <span>{{ file_picker_label }}</span>
@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block multiple_image_uploader_widget %}
-    {%- set attr = attr|merge({'class': 'image-uploader image-uploader--multiple js-multiple-image-uploader', 'data-index': form.children|length, 'data-sortable': sortable, 'data-min-height': min_height, 'data-min-width': min_width, 'data-limit': limit - form.children|length}) -%}
+    {%- set attr = attr|merge({'class': 'image-uploader image-uploader--multiple js-image-uploader js-multiple-image-uploader', 'data-index': form.children|length, 'data-sortable': sortable, 'data-min-height': min_height, 'data-min-width': min_width, 'data-limit': limit - form.children|length}) -%}
     <div {{ block('widget_container_attributes') }}>
         <template>
             {{ form_widget(prototype) }}
