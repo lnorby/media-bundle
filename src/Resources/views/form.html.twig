@@ -1,11 +1,11 @@
 {% block image_uploader_widget %}
-    <div class="image-uploader image-uploader--single js-image-uploader js-single-image-uploader" data-min-height="{{ min_height }}" data-min-width="{{ min_width }}" data-limit="{{ form.vars.data ? 1 : 0 }}">
+    <div class="image-uploader image-uploader--single js-image-uploader js-single-image-uploader" data-min-height="{{ min_height }}" data-min-width="{{ min_width }}" data-limit="{{ form.vars.data ? 0 : 1 }}">
         <label class="image-uploader__file-picker">
             <input type="file" class="js-image-uploader-file-picker" accept="image/*">
             <span>{{ file_picker_label }}</span>
         </label>
 
-        <div class="image-uploader__uploaded-image js-uploaded-image" style="background-image: url('{{ form.vars.data is not empty ? media_cropped_image(form.vars.data, 250, 250) }}');">
+        <div class="image-uploader__uploaded-image js-uploaded-image" style="background-image: url('{{ form.vars.data ? media_cropped_image(form.vars.data, 250, 250) }}');">
             <button type="button" class="image-uploader__remove-button js-uploaded-image-remove-button">törlés</button>
             {{ form_widget(form, {'attr': {'class': 'image-uploader__media-id-input js-uploaded-image-media-id'}}) }}
         </div>
