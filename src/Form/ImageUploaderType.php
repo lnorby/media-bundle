@@ -35,7 +35,10 @@ final class ImageUploaderType extends AbstractType
          */
         $media = $form->getData();
 
+        $view->vars['file_picker_label'] = $options['file_picker_label'];
         $view->vars['image_path'] = $media instanceof Media ? $media->getPath() : '';
+        $view->vars['min_height'] = $options['min_height'];
+        $view->vars['min_width'] = $options['min_width'];
     }
 
     public function configureOptions(OptionsResolver $resolver)
