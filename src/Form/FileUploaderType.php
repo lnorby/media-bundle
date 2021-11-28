@@ -35,7 +35,6 @@ final class FileUploaderType extends AbstractType
         $media = $form->getData();
 
         $view->vars['file_name'] = $media instanceof Media ? $media->getName() : '';
-        $view->vars['file_path'] = $media instanceof Media ? $media->getPath() : '';
     }
 
     public function getParent()
