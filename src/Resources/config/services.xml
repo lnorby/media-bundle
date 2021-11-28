@@ -41,12 +41,13 @@
             <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>
             <tag name="form.type"/>
         </service>
-        <service id="Lnorby\MediaBundle\Form\UploadedImageType">
+        <service id="Lnorby\MediaBundle\Form\ImageUploaderType">
             <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>
             <tag name="form.type"/>
         </service>
-        <service id="Lnorby\MediaBundle\Form\ImageUploaderType">
+        <service id="Lnorby\MediaBundle\Form\UploadedImageType">
             <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>
+            <tag name="form.type"/>
         </service>
     </services>
 </container>
