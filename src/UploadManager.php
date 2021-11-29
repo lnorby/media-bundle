@@ -62,8 +62,8 @@ final class UploadManager
      */
     public function uploadFile(UploadedFile $file): Media
     {
+        dd($file->isValid(), $file->isExecutable(), $file->guessExtension(), $file->guessClientExtension());
         $this->validateFile($file);
-        dd($file);
 
         $path = $this->generateUniqueFilenameWithPath($file->guessExtension());
 
