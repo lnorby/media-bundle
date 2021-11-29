@@ -28,7 +28,12 @@ final class DownloadManager
         $this->storage = $storage;
     }
 
-    public function generateDownloadUrlForFile(Media $media, bool $friendly = false): string
+    public function generateDownloadUrlForFile(Media $media): string
+    {
+        return sprintf('/media/%d/%s', $media->getId(), $media->getName());
+    }
+
+    public function generateDownloadUrlForImage(Media $media, bool $friendly = false): string
     {
         if ($friendly) {
             return sprintf('/media/%d/%s', $media->getId(), $media->getName());

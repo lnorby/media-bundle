@@ -30,12 +30,13 @@ final class MediaExtension extends AbstractExtension
     {
         return [
             new TwigFunction('media_file', [$this, 'file']),
+            new TwigFunction('media_image', [$this, 'image']),
             new TwigFunction('media_resized_image', [$this, 'resizedImage']),
             new TwigFunction('media_cropped_image', [$this, 'croppedImage']),
         ];
     }
 
-    public function file($media, bool $friendly = false): string
+    public function file($media): string
     {
         if (!$media instanceof Media) {
             $media = $this->entityManager->find(Media::class, $media);
@@ -45,7 +46,20 @@ final class MediaExtension extends AbstractExtension
             return '';
         }
 
-        return $this->downloadManager->generateDownloadUrlForFile($media, $friendly);
+        return $this->downloadManager->generateDownloadUrlForFile($media);
+    }
+
+    public function image($media, bool $friendly = false): string
+    {
+        if (!$media instanceof Media) {
+            $media = $this->entityManager->find(Media::class, $media);
+        }
+
+        if (!$media instanceof Media) {
+            return '';
+        }
+
+        return $this->downloadManager->generateDownloadUrlForImage($media, $friendly);
     }
 
     public function resizedImage($media, int $width, int $height, bool $friendly = false): string
