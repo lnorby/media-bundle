@@ -62,10 +62,9 @@ final class UploadManager
      */
     public function uploadFile(UploadedFile $file): Media
     {
-        dd($file->isValid(), $file->isExecutable(), $file->guessExtension(), $file->guessClientExtension());
         $this->validateFile($file);
 
-        $path = $this->generateUniqueFilenameWithPath($file->guessExtension());
+        $path = $this->generateUniqueFilenameWithPath($file->getClientOriginalExtension());
 
         try {
             $this->storage->createFile($path, $file->getContent());
@@ -73,7 +72,7 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $name = $this->convertToSafeFilename($file->getClientOriginalName(), $file->guessExtension());
+        $name = $this->convertToSafeFilename($file->getClientOriginalName(), $file->getClientOriginalExtension());
         $mimeType = $file->getMimeType();
 
         return $this->mediaManager->createMedia($path, $name, $mimeType);
