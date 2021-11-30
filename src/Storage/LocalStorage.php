@@ -14,7 +14,7 @@ final class LocalStorage implements Storage
         $this->path = $path;
     }
 
-    public function createFile(string $file, string $content): void
+    public function createFile(string $file, $content): void
     {
         if ('' === $file) {
             throw new \InvalidArgumentException('No file specified.');

@@ -4,6 +4,7 @@ namespace Lnorby\MediaBundle;
 
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
+use Lnorby\MediaBundle\Exception\CouldNotCreateFile;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
@@ -14,7 +15,6 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
-// TODO: import file
 final class UploadManager
 {
     /**
@@ -55,6 +55,23 @@ final class UploadManager
         $this->mediaManager = $mediaManager;
         $this->storage = $storage;
         $this->slugger = $slugger;
+    }
+
+    /**
+     * @throws CouldNotCreateFile
+     */
+    public function createFile(string $name, $content, string $mimeType): Media
+    {
+        $extension = pathinfo($name, PATHINFO_EXTENSION);
+        $path = $this->generateUniqueFilenameWithPath($extension);
+
+        try {
+            $this->storage->createFile($path, $content);
+        } catch (\Exception $e) {
+            throw new CouldNotCreateFile();
+        }
+
+        return $this->mediaManager->createMedia($path, $this->convertToSafeFilename($name, $extension), $mimeType);
     }
 
     /**

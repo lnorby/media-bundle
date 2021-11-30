@@ -7,7 +7,7 @@ interface Storage
     /**
      * @throws \RuntimeException
      */
-    public function createFile(string $file, string $content): void;
+    public function createFile(string $file, $content): void;
 
     public function deleteFile(string $file): void;
 
