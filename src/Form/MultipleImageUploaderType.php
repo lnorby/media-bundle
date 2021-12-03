@@ -2,14 +2,25 @@
 
 namespace Lnorby\MediaBundle\Form;
 
+use Lnorby\MediaBundle\Entity\Media;
+use Lnorby\MediaBundle\Form\Dto\UploadedImageDto;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class MultipleImageUploaderType extends AbstractType
+final class MultipleImageUploaderType extends AbstractType implements DataTransformerInterface
 {
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if ($options['transform']) {
+            $builder->addModelTransformer($this);
+        }
+    }
+
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['file_picker_label'] = $options['file_picker_label'];
@@ -30,6 +41,7 @@ final class MultipleImageUploaderType extends AbstractType
                 'min_height' => 250,
                 'min_width' => 250,
                 'sortable' => false,
+                'transform' => false,
             ]
         );
 
@@ -38,10 +50,29 @@ final class MultipleImageUploaderType extends AbstractType
         $resolver->setAllowedTypes('min_height', ['int']);
         $resolver->setAllowedTypes('min_width', ['int']);
         $resolver->setAllowedTypes('sortable', ['bool']);
+        $resolver->setAllowedTypes('transform', ['bool']);
     }
 
     public function getParent()
     {
         return CollectionType::class;
+    }
+
+    public function transform($value)
+    {
+        $value->map(
+            function (Media $media) {
+                return UploadedImageDto::create(null, $media);
+            }
+        );
+    }
+
+    public function reverseTransform($value)
+    {
+        return $value->map(
+            function (UploadedImageDto $imageData) {
+                return $imageData->media;
+            }
+        );
     }
 }
