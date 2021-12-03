@@ -61,7 +61,7 @@ final class MultipleImageUploaderType extends AbstractType implements DataTransf
 
     public function transform($value)
     {
-        $value->map(
+        return $value->map(
             function (Media $media) {
                 return UploadedImageDto::create(null, $media);
             }
