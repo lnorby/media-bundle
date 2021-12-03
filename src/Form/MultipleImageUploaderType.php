@@ -2,6 +2,7 @@
 
 namespace Lnorby\MediaBundle\Form;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Form\Dto\UploadedImageDto;
 use Symfony\Component\Form\AbstractType;
@@ -69,10 +70,13 @@ final class MultipleImageUploaderType extends AbstractType implements DataTransf
 
     public function reverseTransform($value)
     {
-        return $value->map(
-            function (UploadedImageDto $imageData) {
-                return $imageData->media;
-            }
+        return new ArrayCollection(
+            array_map(
+                function (UploadedImageDto $imageData) {
+                    return $imageData->media;
+                },
+                $value
+            )
         );
     }
 }
