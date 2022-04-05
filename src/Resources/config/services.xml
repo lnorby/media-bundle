@@ -14,7 +14,6 @@
             <argument type="service" id="doctrine.orm.entity_manager"/>
         </service>
         <service id="Lnorby\MediaBundle\DownloadManager">
-            <argument/>
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
         </service>
         <service id="Lnorby\MediaBundle\UploadManager">
