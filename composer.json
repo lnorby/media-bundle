@@ -15,12 +15,12 @@
   ],
   "require": {
     "php": ">=7.1",
-    "symfony/framework-bundle": "^5.3",
+    "symfony/framework-bundle": "^5.4",
     "intervention/image": "^2.7",
-    "symfony/validator": "^5.3",
+    "symfony/validator": "^5.4",
     "doctrine/orm": "^2.10",
     "twig/twig": "^3.3",
-    "symfony/string": "^5.3",
-    "symfony/form": "^5.3"
+    "symfony/string": "^5.4",
+    "symfony/form": "^5.4"
   }
 }

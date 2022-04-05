@@ -21,24 +21,32 @@ use Symfony\Component\Routing\Annotation\Route;
 class MediaController extends AbstractController
 {
     /**
-     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download", methods={"GET"})
+     * @Route("/media/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="_media_download_modified_image", methods={"GET"})
      */
-    public function download(Media $media, string $name, Request $request, DownloadManager $downloadManager): Response
+    public function downloadModifiedImage(Media $media, int $width, int $height, string $mode, string $name, DownloadManager $downloadManager): Response
     {
         if ($media->getName() !== $name) {
             throw $this->createNotFoundException();
         }
 
-        $width = $request->query->getInt('w');
-        $height = $request->query->getInt('h');
-        $mode = $request->query->get('m');
+        if (0 === $width || 0 === $height || !in_array($mode, [DownloadManager::IMAGE_RESIZE, DownloadManager::IMAGE_CROP])) {
+            throw $this->createNotFoundException();
+        }
 
-        if (0 !== $width && 0 !== $height && null !== $mode && in_array($mode, [DownloadManager::IMAGE_RESIZE, DownloadManager::IMAGE_CROP])) {
-            try {
-                return $downloadManager->downloadModifiedImage($media, $width, $height, $mode);
-            } catch (CouldNotDownloadFile $e) {
-                throw $this->createNotFoundException();
-            }
+        try {
+            return $downloadManager->downloadModifiedImage($media, $width, $height, $mode);
+        } catch (CouldNotDownloadFile $e) {
+            throw $this->createNotFoundException();
+        }
+    }
+
+    /**
+     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download", methods={"GET"})
+     */
+    public function download(Media $media, string $name, DownloadManager $downloadManager): Response
+    {
+        if ($media->getName() !== $name) {
+            throw $this->createNotFoundException();
         }
 
         try {

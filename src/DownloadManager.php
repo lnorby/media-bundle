@@ -46,12 +46,12 @@ final class DownloadManager
     {
         if ($friendly) {
             return sprintf(
-                '/media/%d/%s?w=%d&h=%d&m=%s',
+                '/media/%d/%d/%d/%s/%s',
                 $media->getId(),
-                $media->getName(),
                 $width,
                 $height,
-                $mode
+                $mode,
+                $media->getName()
             );
         }
 
@@ -123,7 +123,7 @@ final class DownloadManager
     private function createFileResponse(string $path): BinaryFileResponse
     {
         $response = new BinaryFileResponse($this->storage->getRealPath($path));
-        $response->setPrivate();
+        $response->setPublic();
         $response->setMaxAge(31536000);
 
         return $response;
