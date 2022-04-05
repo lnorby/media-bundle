@@ -49,20 +49,7 @@ final class MediaExtension extends AbstractExtension
         return $this->downloadManager->generateDownloadUrlForFile($media);
     }
 
-    public function image($media, bool $friendly = false): string
-    {
-        if (!$media instanceof Media) {
-            $media = $this->entityManager->find(Media::class, $media);
-        }
-
-        if (!$media instanceof Media) {
-            return '';
-        }
-
-        return $this->downloadManager->generateDownloadUrlForImage($media, $friendly);
-    }
-
-    public function resizedImage($media, int $width, int $height, bool $friendly = false): string
+    public function resizedImage($media, int $width, int $height): string
     {
         if (!$media instanceof Media) {
             $media = $this->entityManager->find(Media::class, $media);
@@ -76,8 +63,7 @@ final class MediaExtension extends AbstractExtension
             $media,
             $width,
             $height,
-            DownloadManager::IMAGE_RESIZE,
-            $friendly
+            DownloadManager::IMAGE_RESIZE
         );
     }
 

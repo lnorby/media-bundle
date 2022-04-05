@@ -13,18 +13,12 @@ final class DownloadManager
     public const IMAGE_CROP = 'c';
 
     /**
-     * @var string
-     */
-    private $publicPath;
-
-    /**
      * @var Storage
      */
     private $storage;
 
-    public function __construct(string $publicPath, Storage $storage)
+    public function __construct(Storage $storage)
     {
-        $this->publicPath = $publicPath;
         $this->storage = $storage;
     }
 
@@ -33,35 +27,16 @@ final class DownloadManager
         return sprintf('/media/%d/%s', $media->getId(), $media->getName());
     }
 
-    public function generateDownloadUrlForImage(Media $media, bool $friendly = false): string
+    public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode): string
     {
-        if ($friendly) {
-            return sprintf('/media/%d/%s', $media->getId(), $media->getName());
-        }
-
-        return $this->publicPath . '/' . $media->getPath();
-    }
-
-    public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode, bool $friendly = false): string
-    {
-        if ($friendly) {
-            return sprintf(
-                '/media/%d/%d/%d/%s/%s',
-                $media->getId(),
-                $width,
-                $height,
-                $mode,
-                $media->getName()
-            );
-        }
-
-        try {
-            $path = $this->getModifiedImagePath($media, $width, $height, $mode);
-        } catch (CouldNotDownloadFile $e) {
-            return '';
-        }
-
-        return $this->publicPath . '/' . $path;
+        return sprintf(
+            '/media/%d/%d/%d/%s/%s',
+            $media->getId(),
+            $width,
+            $height,
+            $mode,
+            $media->getName()
+        );
     }
 
     /**

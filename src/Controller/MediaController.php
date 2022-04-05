@@ -43,7 +43,7 @@ class MediaController extends AbstractController
     /**
      * @Route("/media/{id}/{name<[^/]+>}", name="_media_download", methods={"GET"})
      */
-    public function download(Media $media, string $name, DownloadManager $downloadManager): Response
+    public function downloadFile(Media $media, string $name, DownloadManager $downloadManager): Response
     {
         if ($media->getName() !== $name) {
             throw $this->createNotFoundException();
