@@ -67,7 +67,7 @@ final class MediaExtension extends AbstractExtension
         );
     }
 
-    public function croppedImage($media, int $width, int $height, bool $friendly = false): string
+    public function croppedImage($media, int $width, int $height): string
     {
         if (!$media instanceof Media) {
             $media = $this->entityManager->find(Media::class, $media);
@@ -81,8 +81,7 @@ final class MediaExtension extends AbstractExtension
             $media,
             $width,
             $height,
-            DownloadManager::IMAGE_CROP,
-            $friendly
+            DownloadManager::IMAGE_CROP
         );
     }
 }
