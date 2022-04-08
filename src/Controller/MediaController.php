@@ -23,19 +23,47 @@ use Symfony\Component\Routing\Annotation\Route;
 // TODO: translations
 class MediaController extends AbstractController
 {
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    /**
+     * @var DownloadManager
+     */
+    private $downloadManager;
+
+    /**
+     * @var UploadManager
+     */
+    private $uploadManager;
+
+    public function __construct(RequestStack $requestStack, EntityManagerInterface $entityManager, DownloadManager $downloadManager, UploadManager $uploadManager)
+    {
+        $this->requestStack = $requestStack;
+        $this->entityManager = $entityManager;
+        $this->downloadManager = $downloadManager;
+        $this->uploadManager = $uploadManager;
+    }
+
 //    /**
 //     * @Route("/media/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="_media_download_modified_image", methods={"GET"})
 //     */
-    public function downloadModifiedImage(RequestStack $requestStack, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
+    public function downloadModifiedImage(): Response
     {
-        $request = $requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
         $id = $request->attributes->getInt('id');
         $width = $request->attributes->getInt('width');
         $height = $request->attributes->getInt('height');
         $mode = $request->attributes->get('mode');
         $name = $request->attributes->get('name');
 
-        $media = $entityManager->find(Media::class, $id);
+        $media = $this->entityManager->find(Media::class, $id);
 
         if (!$media instanceof Media) {
             throw $this->createNotFoundException();
@@ -50,7 +78,7 @@ class MediaController extends AbstractController
         }
 
         try {
-            return $downloadManager->downloadModifiedImage($media, $width, $height, $mode);
+            return $this->downloadManager->downloadModifiedImage($media, $width, $height, $mode);
         } catch (CouldNotDownloadFile $e) {
             throw $this->createNotFoundException();
         }
@@ -59,13 +87,13 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download_file", methods={"GET"})
 //     */
-    public function downloadFile(RequestStack $requestStack, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
+    public function downloadFile(): Response
     {
-        $request = $requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
         $id = $request->attributes->getInt('id');
         $name = $request->attributes->get('name');
 
-        $media = $entityManager->find(Media::class, $id);
+        $media = $this->entityManager->find(Media::class, $id);
 
         if (!$media instanceof Media) {
             throw $this->createNotFoundException();
@@ -76,7 +104,7 @@ class MediaController extends AbstractController
         }
 
         try {
-            return $downloadManager->downloadFile($media);
+            return $this->downloadManager->downloadFile($media);
         } catch (CouldNotDownloadFile $e) {
             throw $this->createNotFoundException();
         }
@@ -85,14 +113,14 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/_media/upload-file", name="_media_upload_file", methods={"POST"})
 //     */
-    public function uploadFile(RequestStack $requestStack, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadFile(): Response
     {
-        $request = $requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         $file = $request->files->get('file');
 
         try {
-            $media = $uploadManager->uploadFile($file);
+            $media = $this->uploadManager->uploadFile($file);
         } catch (NoFile $e) {
             return $this->errorResponse('Nem adott meg fájlt.');
         } catch (UploadSizeExceeded $e) {
@@ -107,7 +135,7 @@ class MediaController extends AbstractController
             [
                 'id' => $media->getId(),
                 'name' => $media->getName(),
-                'url' => $downloadManager->generateDownloadUrlForFile($media),
+                'url' => $this->downloadManager->generateDownloadUrlForFile($media),
             ]
         );
     }
@@ -115,16 +143,16 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/_media/upload-image", name="_media_upload_image", methods={"POST"})
 //     */
-    public function uploadImage(RequestStack $requestStack, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadImage(): Response
     {
-        $request = $requestStack->getCurrentRequest();
+        $request = $this->requestStack->getCurrentRequest();
 
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
 
         try {
-            $media = $uploadManager->uploadImage($image, $minWidth, $minHeight);
+            $media = $this->uploadManager->uploadImage($image, $minWidth, $minHeight);
         } catch (NoFile $e) {
             return $this->errorResponse('Nem adott meg képet.');
         } catch (InvalidFile $e) {
@@ -142,7 +170,7 @@ class MediaController extends AbstractController
         return $this->json(
             [
                 'id' => $media->getId(),
-                'url' => $downloadManager->generateDownloadUrlForModifiedImage(
+                'url' => $this->downloadManager->generateDownloadUrlForModifiedImage(
                     $media,
                     250,
                     250,

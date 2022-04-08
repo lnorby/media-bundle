@@ -6,26 +6,10 @@
 
     <services>
         <service id="Lnorby\MediaBundle\Controller\MediaController" public="true">
-            <call method="downloadModifiedImage">
-                <argument type="service" id="request_stack"/>
-                <argument type="service" id="doctrine.orm.entity_manager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
-            </call>
-            <call method="downloadFile">
-                <argument type="service" id="request_stack"/>
-                <argument type="service" id="doctrine.orm.entity_manager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
-            </call>
-            <call method="uploadFile">
-                <argument type="service" id="request_stack"/>
-                <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
-            </call>
-            <call method="uploadImage">
-                <argument type="service" id="request_stack"/>
-                <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
-            </call>
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+            <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
             <tag name="container.service_subscriber"/>
         </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
