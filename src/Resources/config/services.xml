@@ -5,6 +5,11 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="Lnorby\MediaBundle\Controller\MediaController" public="true">
+            <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
+            <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+            <argument type="service" id="doctrine.orm.entity_manager"/>
+        </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
             <argument/>
         </service>

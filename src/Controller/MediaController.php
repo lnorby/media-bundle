@@ -2,6 +2,7 @@
 
 namespace Lnorby\MediaBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Lnorby\MediaBundle\DownloadManager;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
@@ -12,59 +13,85 @@ use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
 use Lnorby\MediaBundle\UploadManager;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 // TODO: translations
-class MediaController extends AbstractController
+class MediaController
 {
     /**
-     * @Route("/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="lnorby_media_download_modified_image", methods={"GET"})
+     * @var UploadManager
      */
-    public function downloadModifiedImage(Media $media, int $width, int $height, string $mode, string $name, DownloadManager $downloadManager): Response
+    private $uploadManager;
+
+    /**
+     * @var DownloadManager
+     */
+    private $downloadManager;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, EntityManagerInterface $entityManager)
     {
-        if ($media->getName() !== $name) {
-            throw $this->createNotFoundException();
+        $this->uploadManager = $uploadManager;
+        $this->downloadManager = $downloadManager;
+        $this->entityManager = $entityManager;
+    }
+
+    public function downloadModifiedImage(Request $request): Response
+    {
+        $id = $request->attributes->getInt('id');
+        $width = $request->attributes->getInt('width');
+        $height = $request->attributes->getInt('height');
+        $mode = $request->attributes->get('mode');
+        $name = $request->attributes->get('name');
+
+        $media = $this->entityManager->find(Media::class, $id);
+
+        if (!$media instanceof Media || $media->getName() !== $name) {
+            throw new NotFoundHttpException();
         }
 
         if (0 === $width || 0 === $height || !in_array($mode, [DownloadManager::IMAGE_RESIZE, DownloadManager::IMAGE_CROP])) {
-            throw $this->createNotFoundException();
+            throw new NotFoundHttpException();
         }
 
         try {
-            return $downloadManager->downloadModifiedImage($media, $width, $height, $mode);
+            return $this->downloadManager->downloadModifiedImage($media, $width, $height, $mode);
         } catch (CouldNotDownloadFile $e) {
-            throw $this->createNotFoundException();
+            throw new NotFoundHttpException();
         }
     }
 
-    /**
-     * @Route("/{id}/{name<[^/]+>}", name="lnorby_media_download_file", methods={"GET"})
-     */
-    public function downloadFile(Media $media, string $name, DownloadManager $downloadManager): Response
+    public function downloadFile(Request $request): Response
     {
-        if ($media->getName() !== $name) {
-            throw $this->createNotFoundException();
+        $id = $request->attributes->getInt('id');
+        $name = $request->attributes->get('name');
+
+        $media = $this->entityManager->find(Media::class, $id);
+
+        if (!$media instanceof Media || $media->getName() !== $name) {
+            throw new NotFoundHttpException();
         }
 
         try {
-            return $downloadManager->downloadFile($media);
+            return $this->downloadManager->downloadFile($media);
         } catch (CouldNotDownloadFile $e) {
-            throw $this->createNotFoundException();
+            throw new NotFoundHttpException();
         }
     }
 
-    /**
-     * @Route("/upload-file", name="lnorby_media_upload_file", methods={"POST"})
-     */
-    public function uploadFile(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadFile(Request $request): Response
     {
         $file = $request->files->get('file');
 
         try {
-            $media = $uploadManager->uploadFile($file);
+            $media = $this->uploadManager->uploadFile($file);
         } catch (NoFile $e) {
             return $this->errorResponse('Nem adott meg fájlt.');
         } catch (UploadSizeExceeded $e) {
@@ -75,26 +102,23 @@ class MediaController extends AbstractController
             return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
 
-        return $this->json(
+        return new JsonResponse(
             [
                 'id' => $media->getId(),
                 'name' => $media->getName(),
-                'url' => $downloadManager->generateDownloadUrlForFile($media),
+                'url' => $this->downloadManager->generateDownloadUrlForFile($media),
             ]
         );
     }
 
-    /**
-     * @Route("/upload-image", name="lnorby_media_upload_image", methods={"POST"})
-     */
-    public function uploadImage(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadImage(Request $request): Response
     {
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
 
         try {
-            $media = $uploadManager->uploadImage($image, $minWidth, $minHeight);
+            $media = $this->uploadManager->uploadImage($image, $minWidth, $minHeight);
         } catch (NoFile $e) {
             return $this->errorResponse('Nem adott meg képet.');
         } catch (InvalidFile $e) {
@@ -109,10 +133,10 @@ class MediaController extends AbstractController
             return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
 
-        return $this->json(
+        return new JsonResponse(
             [
                 'id' => $media->getId(),
-                'url' => $downloadManager->generateDownloadUrlForModifiedImage(
+                'url' => $this->downloadManager->generateDownloadUrlForModifiedImage(
                     $media,
                     250,
                     250,
