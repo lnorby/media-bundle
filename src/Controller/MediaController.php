@@ -107,6 +107,10 @@ class MediaController
                 'id' => $media->getId(),
                 'name' => $media->getName(),
                 'url' => $this->downloadManager->generateDownloadUrlForFile($media),
+            ],
+            200,
+            [
+                'Access-Control-Allow-Origin' => '*',
             ]
         );
     }
@@ -142,6 +146,10 @@ class MediaController
                     250,
                     DownloadManager::IMAGE_CROP
                 ),
+            ],
+            200,
+            [
+                'Access-Control-Allow-Origin' => '*',
             ]
         );
     }
