@@ -5,6 +5,9 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="Lnorby\MediaBundle\Controller\MediaController">
+            <tag name="controller.service_arguments"/>
+        </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
             <argument/>
         </service>
