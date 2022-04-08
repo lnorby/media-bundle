@@ -1,10 +1,10 @@
 lnorby_media_download_modified_image:
-    path: /{id}/{width}/{height}/{mode}/{name<[^/]+>}
+    path: /{id<\d+>}/{width}/{height}/{mode}/{name<[^/]+>}
     controller: Lnorby\MediaBundle\Controller\MediaController::downloadModifiedImage
     methods: GET
 
 lnorby_media_download_file:
-    path: /{id}/{name<[^/]+>}
+    path: /{id<\d+>}/{name<[^/]+>}
     controller: Lnorby\MediaBundle\Controller\MediaController::downloadFile
     methods: GET
 
