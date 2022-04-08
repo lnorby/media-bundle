@@ -10,7 +10,6 @@
             <argument type="service" id="doctrine.orm.entity_manager"/>
             <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
-            <tag name="container.service_subscriber"/>
         </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
             <argument/>
