@@ -20,9 +20,9 @@ use Symfony\Component\Routing\Annotation\Route;
 // TODO: translations
 class MediaController extends AbstractController
 {
-    /**
-     * @Route("/media/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="_media_download_modified_image", methods={"GET"})
-     */
+//    /**
+//     * @Route("/media/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="_media_download_modified_image", methods={"GET"})
+//     */
     public function downloadModifiedImage(Media $media, int $width, int $height, string $mode, string $name, DownloadManager $downloadManager): Response
     {
         if ($media->getName() !== $name) {
@@ -40,9 +40,9 @@ class MediaController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download", methods={"GET"})
-     */
+//    /**
+//     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download", methods={"GET"})
+//     */
     public function downloadFile(Media $media, string $name, DownloadManager $downloadManager): Response
     {
         if ($media->getName() !== $name) {
@@ -56,9 +56,9 @@ class MediaController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/_media/upload-file", name="_media_upload_file", methods={"POST"})
-     */
+//    /**
+//     * @Route("/_media/upload-file", name="_media_upload_file", methods={"POST"})
+//     */
     public function uploadFile(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
         $file = $request->files->get('file');
@@ -84,9 +84,9 @@ class MediaController extends AbstractController
         );
     }
 
-    /**
-     * @Route("/_media/upload-image", name="_media_upload_image", methods={"POST"})
-     */
+//    /**
+//     * @Route("/_media/upload-image", name="_media_upload_image", methods={"POST"})
+//     */
     public function uploadImage(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
         $image = $request->files->get('image');

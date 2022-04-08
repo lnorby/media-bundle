@@ -1,0 +1,19 @@
+lnorby_media_download_modified_image:
+    path: /{id}/{width}/{height}/{mode}/{name<[^/]+>}
+    controller: Lnorby\MediaBundle\Controller\MediaController::downloadModifiedImage
+    methods: GET
+
+lnorby_media_download:
+    path: /{id}/{name<[^/]+>}
+    controller: Lnorby\MediaBundle\Controller\MediaController::downloadFile
+    methods: GET
+
+lnorby_media_upload_file:
+    path: /upload-file
+    controller: Lnorby\MediaBundle\Controller\MediaController::uploadFile
+    methods: POST
+
+lnorby_media_upload_image:
+    path: /upload-image
+    controller: Lnorby\MediaBundle\Controller\MediaController::uploadImage
+    methods: POST

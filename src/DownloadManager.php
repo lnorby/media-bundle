@@ -24,13 +24,13 @@ final class DownloadManager
 
     public function generateDownloadUrlForFile(Media $media): string
     {
-        return sprintf('/media/%d/%s', $media->getId(), $media->getName());
+        return sprintf('/%d/%s', $media->getId(), $media->getName());
     }
 
     public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode): string
     {
         return sprintf(
-            '/media/%d/%d/%d/%s/%s',
+            '/%d/%d/%d/%s/%s',
             $media->getId(),
             $width,
             $height,
