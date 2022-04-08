@@ -5,12 +5,6 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="Lnorby\MediaBundle\Controller\MediaController" public="true">
-            <argument type="service" id="request_stack"/>
-            <argument type="service" id="doctrine.orm.entity_manager"/>
-            <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
-            <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
-        </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
             <argument/>
         </service>
@@ -21,6 +15,7 @@
         </service>
         <service id="Lnorby\MediaBundle\DownloadManager">
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
+            <argument type="service" id="app.localization.routing.url_matcher.inner"/>
         </service>
         <service id="Lnorby\MediaBundle\UploadManager">
             <argument/>

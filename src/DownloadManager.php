@@ -6,6 +6,7 @@ use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\CouldNotDownloadFile;
 use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class DownloadManager
 {
@@ -17,25 +18,39 @@ final class DownloadManager
      */
     private $storage;
 
-    public function __construct(Storage $storage)
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
+    public function __construct(Storage $storage, UrlGeneratorInterface $urlGenerator)
     {
         $this->storage = $storage;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function generateDownloadUrlForFile(Media $media): string
     {
-        return sprintf('/%d/%s', $media->getId(), $media->getName());
+        return $this->urlGenerator->generate(
+            'lnorby_media_download_file',
+            [
+                'id' => $media->getId(),
+                'name' => $media->getName(),
+            ]
+        );
     }
 
     public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode): string
     {
-        return sprintf(
-            '/%d/%d/%d/%s/%s',
-            $media->getId(),
-            $width,
-            $height,
-            $mode,
-            $media->getName()
+        return $this->urlGenerator->generate(
+            'lnorby_media_download_modified_image',
+            [
+                'id' => $media->getId(),
+                'width' => $width,
+                'height' => $height,
+                'mode' => $mode,
+                'name' => $media->getName(),
+            ]
         );
     }
 
