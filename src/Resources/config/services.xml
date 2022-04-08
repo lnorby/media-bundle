@@ -15,7 +15,7 @@
         </service>
         <service id="Lnorby\MediaBundle\DownloadManager">
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
-            <argument type="service" id="app.localization.routing.url_matcher.inner"/>
+            <argument type="service" id="router.default"/>
         </service>
         <service id="Lnorby\MediaBundle\UploadManager">
             <argument/>
