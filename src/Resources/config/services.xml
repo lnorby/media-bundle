@@ -6,7 +6,30 @@
 
     <services>
         <service id="Lnorby\MediaBundle\Controller\MediaController">
-            <tag name="controller.service_arguments"/>
+            <call method="downloadModifiedImage">
+                <argument/>
+                <argument/>
+                <argument/>
+                <argument/>
+                <argument/>
+                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+            </call>
+            <call method="downloadFile">
+                <argument/>
+                <argument/>
+                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+            </call>
+            <call method="uploadFile">
+                <argument/>
+                <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
+                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+            </call>
+            <call method="uploadImage">
+                <argument/>
+                <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
+                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+            </call>
+            <tag name="container.service_subscriber"/>
         </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
             <argument/>
