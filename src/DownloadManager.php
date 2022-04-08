@@ -36,7 +36,8 @@ final class DownloadManager
             [
                 'id' => $media->getId(),
                 'name' => $media->getName(),
-            ]
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
         );
     }
 
@@ -50,7 +51,8 @@ final class DownloadManager
                 'height' => $height,
                 'mode' => $mode,
                 'name' => $media->getName(),
-            ]
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
         );
     }
 
