@@ -7,29 +7,20 @@
     <services>
         <service id="Lnorby\MediaBundle\Controller\MediaController" public="true">
             <call method="downloadModifiedImage">
-                <argument/>
-                <argument/>
-                <argument/>
-                <argument/>
-                <argument/>
-                <argument type="service" id="doctrine.orm.entity_manager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+                <argument key="$entityManager" type="service" id="doctrine.orm.entity_manager"/>
+                <argument key="$downloadManager" type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             </call>
             <call method="downloadFile">
-                <argument/>
-                <argument/>
-                <argument type="service" id="doctrine.orm.entity_manager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+                <argument key="$entityManager" type="service" id="doctrine.orm.entity_manager"/>
+                <argument key="$downloadManager" type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             </call>
             <call method="uploadFile">
-                <argument/>
-                <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+                <argument key="$uploadManager" type="service" id="Lnorby\MediaBundle\UploadManager"/>
+                <argument key="$downloadManager" type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             </call>
             <call method="uploadImage">
-                <argument/>
-                <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
-                <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
+                <argument key="$uploadManager" type="service" id="Lnorby\MediaBundle\UploadManager"/>
+                <argument key="$downloadManager" type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             </call>
             <tag name="container.service_subscriber"/>
         </service>
