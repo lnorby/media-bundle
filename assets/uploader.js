@@ -47,7 +47,7 @@ function uploadImage(_uploader, file) {
     formData.append('min_width', _uploader.getAttribute('data-min-width'));
 
     axios
-        .post(`/_media/upload-image`, formData)
+        .post(lnorbyMediaImageUploadPath, formData)
         .then((response) => {
             _image.classList.remove('is-uploading');
             _image.style.backgroundImage = `url('${response.data.url}')`;
@@ -91,7 +91,7 @@ function uploadFile(_uploader, file) {
     formData.append('file', file, file.name);
 
     axios
-        .post(`/_media/upload-file`, formData)
+        .post(lnorbyMediaFileUploadPath, formData)
         .then((response) => {
             _uploader.querySelector('.js-file-uploader-media-id').value = response.data.id;
 
