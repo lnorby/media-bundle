@@ -2,6 +2,7 @@
 
 namespace Lnorby\MediaBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Lnorby\MediaBundle\DownloadManager;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
@@ -11,6 +12,7 @@ use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
+use Lnorby\MediaBundle\Repository\MediaRepository;
 use Lnorby\MediaBundle\UploadManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +25,14 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/media/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="_media_download_modified_image", methods={"GET"})
 //     */
-    public function downloadModifiedImage(Media $media, int $width, int $height, string $mode, string $name, DownloadManager $downloadManager): Response
+    public function downloadModifiedImage(int $id, int $width, int $height, string $mode, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
     {
+        $media = $entityManager->find(Media::class, $id);
+
+        if (!$media instanceof Media) {
+            throw $this->createNotFoundException();
+        }
+
         if ($media->getName() !== $name) {
             throw $this->createNotFoundException();
         }
@@ -41,10 +49,16 @@ class MediaController extends AbstractController
     }
 
 //    /**
-//     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download", methods={"GET"})
+//     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download_file", methods={"GET"})
 //     */
-    public function downloadFile(Media $media, string $name, DownloadManager $downloadManager): Response
+    public function downloadFile(int $id, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
     {
+        $media = $entityManager->find(Media::class, $id);
+
+        if (!$media instanceof Media) {
+            throw $this->createNotFoundException();
+        }
+
         if ($media->getName() !== $name) {
             throw $this->createNotFoundException();
         }

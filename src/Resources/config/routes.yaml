@@ -3,7 +3,7 @@ lnorby_media_download_modified_image:
     controller: Lnorby\MediaBundle\Controller\MediaController::downloadModifiedImage
     methods: GET
 
-lnorby_media_download:
+lnorby_media_download_file:
     path: /{id}/{name<[^/]+>}
     controller: Lnorby\MediaBundle\Controller\MediaController::downloadFile
     methods: GET

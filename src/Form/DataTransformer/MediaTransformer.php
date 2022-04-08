@@ -36,7 +36,7 @@ final class MediaTransformer implements DataTransformerInterface
 
         $media = $this->entityManager->find(Media::class, $mediaId);
 
-        if (null === $media) {
+        if (!$media instanceof Media) {
             throw new TransformationFailedException('Media does not exist.');
         }
 

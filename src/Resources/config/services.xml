@@ -12,11 +12,13 @@
                 <argument/>
                 <argument/>
                 <argument/>
+                <argument type="service" id="doctrine.orm.entity_manager"/>
                 <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             </call>
             <call method="downloadFile">
                 <argument/>
                 <argument/>
+                <argument type="service" id="doctrine.orm.entity_manager"/>
                 <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             </call>
             <call method="uploadFile">
