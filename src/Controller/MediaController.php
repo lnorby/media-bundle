@@ -25,7 +25,7 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/media/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="_media_download_modified_image", methods={"GET"})
 //     */
-    public function downloadModifiedImage(int $id, int $width, int $height, string $mode, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
+    public function downloadModifiedImage(string $id, string $width, string $height, string $mode, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
     {
         $media = $entityManager->find(Media::class, $id);
 
@@ -36,6 +36,9 @@ class MediaController extends AbstractController
         if ($media->getName() !== $name) {
             throw $this->createNotFoundException();
         }
+
+        $width = (int)$width;
+        $height = (int)$height;
 
         if (0 === $width || 0 === $height || !in_array($mode, [DownloadManager::IMAGE_RESIZE, DownloadManager::IMAGE_CROP])) {
             throw $this->createNotFoundException();
@@ -51,7 +54,7 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download_file", methods={"GET"})
 //     */
-    public function downloadFile(int $id, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
+    public function downloadFile(string $id, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
     {
         $media = $entityManager->find(Media::class, $id);
 
