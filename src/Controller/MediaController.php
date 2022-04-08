@@ -16,6 +16,7 @@ use Lnorby\MediaBundle\Repository\MediaRepository;
 use Lnorby\MediaBundle\UploadManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -25,8 +26,15 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/media/{id}/{width}/{height}/{mode}/{name<[^/]+>}", name="_media_download_modified_image", methods={"GET"})
 //     */
-    public function downloadModifiedImage(string $id, string $width, string $height, string $mode, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
+    public function downloadModifiedImage(RequestStack $requestStack, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
     {
+        $request = $requestStack->getCurrentRequest();
+        $id = $request->attributes->getInt('id');
+        $width = $request->attributes->getInt('width');
+        $height = $request->attributes->getInt('height');
+        $mode = $request->attributes->get('mode');
+        $name = $request->attributes->get('name');
+
         $media = $entityManager->find(Media::class, $id);
 
         if (!$media instanceof Media) {
@@ -36,9 +44,6 @@ class MediaController extends AbstractController
         if ($media->getName() !== $name) {
             throw $this->createNotFoundException();
         }
-
-        $width = (int)$width;
-        $height = (int)$height;
 
         if (0 === $width || 0 === $height || !in_array($mode, [DownloadManager::IMAGE_RESIZE, DownloadManager::IMAGE_CROP])) {
             throw $this->createNotFoundException();
@@ -54,8 +59,12 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/media/{id}/{name<[^/]+>}", name="_media_download_file", methods={"GET"})
 //     */
-    public function downloadFile(string $id, string $name, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
+    public function downloadFile(RequestStack $requestStack, EntityManagerInterface $entityManager, DownloadManager $downloadManager): Response
     {
+        $request = $requestStack->getCurrentRequest();
+        $id = $request->attributes->getInt('id');
+        $name = $request->attributes->get('name');
+
         $media = $entityManager->find(Media::class, $id);
 
         if (!$media instanceof Media) {
@@ -76,8 +85,10 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/_media/upload-file", name="_media_upload_file", methods={"POST"})
 //     */
-    public function uploadFile(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadFile(RequestStack $requestStack, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
+        $request = $requestStack->getCurrentRequest();
+
         $file = $request->files->get('file');
 
         try {
@@ -104,8 +115,10 @@ class MediaController extends AbstractController
 //    /**
 //     * @Route("/_media/upload-image", name="_media_upload_image", methods={"POST"})
 //     */
-    public function uploadImage(Request $request, UploadManager $uploadManager, DownloadManager $downloadManager): Response
+    public function uploadImage(RequestStack $requestStack, UploadManager $uploadManager, DownloadManager $downloadManager): Response
     {
+        $request = $requestStack->getCurrentRequest();
+
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
