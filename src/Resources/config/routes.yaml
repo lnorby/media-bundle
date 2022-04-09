@@ -9,6 +9,6 @@ lnorby_media_upload_image:
     methods: POST
 
 lnorby_media_download:
-    path: /{path}
+    path: /{path<.+>}
     controller: Lnorby\MediaBundle\Controller\MediaController::download
     methods: GET
