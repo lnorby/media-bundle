@@ -7,7 +7,7 @@
             <generator strategy="IDENTITY"/>
         </id>
 
-        <field name="path"/>
+        <field name="path" unique="true"/>
         <field name="name"/>
         <field name="mimeType"/>
     </entity>

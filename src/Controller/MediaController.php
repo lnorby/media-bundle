@@ -2,16 +2,15 @@
 
 namespace Lnorby\MediaBundle\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Lnorby\MediaBundle\DownloadManager;
-use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\BadImageDimensions;
-use Lnorby\MediaBundle\Exception\CouldNotDownloadFile;
+use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
 use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
 use Lnorby\MediaBundle\Exception\InvalidFile;
 use Lnorby\MediaBundle\Exception\NoFile;
 use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
+use Lnorby\MediaBundle\Repository\MediaRepository;
 use Lnorby\MediaBundle\UploadManager;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,56 +31,44 @@ class MediaController
     private $downloadManager;
 
     /**
-     * @var EntityManagerInterface
+     * @var MediaRepository
      */
-    private $entityManager;
+    private $mediaRepository;
 
-    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, EntityManagerInterface $entityManager)
+    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository)
     {
         $this->uploadManager = $uploadManager;
         $this->downloadManager = $downloadManager;
-        $this->entityManager = $entityManager;
+        $this->mediaRepository = $mediaRepository;
     }
 
-    public function downloadModifiedImage(Request $request): Response
+    public function download(Request $request): Response
     {
-        $id = $request->attributes->getInt('id');
-        $width = $request->attributes->getInt('width');
-        $height = $request->attributes->getInt('height');
-        $mode = $request->attributes->get('mode');
-        $name = $request->attributes->get('name');
+        $path = $request->attributes->get('path');
 
-        $media = $this->entityManager->find(Media::class, $id);
+        if (preg_match('#^([0-9a-f]{10})\.(\d+)x(\d+)([rc])(\.[a-z0-9]+)$#', $path, $matches)) {
+            try {
+                $media = $this->mediaRepository->getByPath($matches[1] . $matches[5]);
+            } catch (CouldNotFindMedia $e) {
+                throw new NotFoundHttpException();
+            }
 
-        if (!$media instanceof Media || $media->getName() !== $name) {
-            throw new NotFoundHttpException();
-        }
-
-        if (0 === $width || 0 === $height || !in_array($mode, [DownloadManager::IMAGE_RESIZE, DownloadManager::IMAGE_CROP])) {
-            throw new NotFoundHttpException();
+            try {
+                return $this->downloadManager->downloadModifiedImage($media, $matches[2], $matches[3], $matches[4]);
+            } catch (\RuntimeException $e) {
+                throw new NotFoundHttpException();
+            }
         }
 
         try {
-            return $this->downloadManager->downloadModifiedImage($media, $width, $height, $mode);
-        } catch (CouldNotDownloadFile $e) {
-            throw new NotFoundHttpException();
-        }
-    }
-
-    public function downloadFile(Request $request): Response
-    {
-        $id = $request->attributes->getInt('id');
-        $name = $request->attributes->get('name');
-
-        $media = $this->entityManager->find(Media::class, $id);
-
-        if (!$media instanceof Media || $media->getName() !== $name) {
+            $media = $this->mediaRepository->getByPath($path);
+        } catch (CouldNotFindMedia $e) {
             throw new NotFoundHttpException();
         }
 
         try {
             return $this->downloadManager->downloadFile($media);
-        } catch (CouldNotDownloadFile $e) {
+        } catch (\RuntimeException $e) {
             throw new NotFoundHttpException();
         }
     }
@@ -107,10 +94,6 @@ class MediaController
                 'id' => $media->getId(),
                 'name' => $media->getName(),
                 'url' => $this->downloadManager->generateDownloadUrlForFile($media),
-            ],
-            200,
-            [
-                'Access-Control-Allow-Origin' => '*',
             ]
         );
     }
@@ -146,10 +129,6 @@ class MediaController
                     250,
                     DownloadManager::IMAGE_CROP
                 ),
-            ],
-            200,
-            [
-                'Access-Control-Allow-Origin' => '*',
             ]
         );
     }
