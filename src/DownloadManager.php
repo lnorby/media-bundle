@@ -114,6 +114,8 @@ final class DownloadManager
 
     private function createFileResponse(string $path): BinaryFileResponse
     {
+        BinaryFileResponse::trustXSendfileTypeHeader();
+
         $response = new BinaryFileResponse($this->storage->getRealPath($path));
         $response->setPrivate();
         $response->setMaxAge(31536000);
