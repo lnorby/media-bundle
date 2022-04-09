@@ -6,6 +6,8 @@ use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\CouldNotDownloadFile;
 use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class DownloadManager
@@ -59,7 +61,7 @@ final class DownloadManager
     /**
      * @throws CouldNotDownloadFile
      */
-    public function downloadFile(Media $media): BinaryFileResponse
+    public function downloadFile(Media $media): Response
     {
         if (!$this->storage->fileExists($media->getPath())) {
             throw new CouldNotDownloadFile();
@@ -68,7 +70,7 @@ final class DownloadManager
         return $this->createFileResponse($media->getPath());
     }
 
-    public function downloadModifiedImage(Media $media, int $width, int $height, string $mode): BinaryFileResponse
+    public function downloadModifiedImage(Media $media, int $width, int $height, string $mode): Response
     {
         return $this->createFileResponse($this->getModifiedImagePath($media, $width, $height, $mode));
     }
@@ -112,10 +114,12 @@ final class DownloadManager
         return $path;
     }
 
-    private function createFileResponse(string $path): BinaryFileResponse
+    private function createFileResponse(string $path): Response
     {
-        BinaryFileResponse::trustXSendfileTypeHeader();
+//        BinaryFileResponse::trustXSendfileTypeHeader();
+//
+//        return new BinaryFileResponse($this->storage->getRealPath($path), 200, [], false);
 
-        return new BinaryFileResponse($this->storage->getRealPath($path), 200, [], false);
+        return new RedirectResponse($this->storage->getRealPath($path));
     }
 }
