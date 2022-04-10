@@ -60,17 +60,7 @@ class MediaController
             }
         }
 
-        try {
-            $media = $this->mediaRepository->getByPath($path);
-        } catch (CouldNotFindMedia $e) {
-            throw new NotFoundHttpException();
-        }
-
-        try {
-            return $this->downloadManager->downloadFile($media);
-        } catch (\RuntimeException $e) {
-            throw new NotFoundHttpException();
-        }
+        throw new NotFoundHttpException();
     }
 
     public function uploadFile(Request $request): Response
