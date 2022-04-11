@@ -53,8 +53,6 @@ class MediaController
                 throw new NotFoundHttpException();
             }
 
-            return new Response('Működik');
-
             try {
                 return $this->downloadManager->downloadModifiedImage($media, $matches[2], $matches[3], $matches[4]);
             } catch (\RuntimeException $e) {
