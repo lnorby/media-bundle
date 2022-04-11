@@ -45,7 +45,7 @@ class MediaController
     public function download(Request $request): Response
     {
         $path = $request->attributes->get('path');
-        return new Response($path);
+        return new Response('Path:' . $path);
 
         if (preg_match('#^((?:[0-9a-f]{2}/){3}[0-9a-f]{10})\.(\d+)x(\d+)([rc])(\.[a-z0-9]+)$#', $path, $matches)) {
             try {
