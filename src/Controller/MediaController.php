@@ -47,12 +47,13 @@ class MediaController
         $path = $request->attributes->get('path');
 
         if (preg_match('#^((?:[0-9a-f]{2}/){3}[0-9a-f]{10})\.(\d+)x(\d+)([rc])(\.[a-z0-9]+)$#', $path, $matches)) {
-            return new Response('Működik ez.');
             try {
                 $media = $this->mediaRepository->getByPath($matches[1] . $matches[5]);
             } catch (CouldNotFindMedia $e) {
                 throw new NotFoundHttpException();
             }
+
+            return new Response('Működik');
 
             try {
                 return $this->downloadManager->downloadModifiedImage($media, $matches[2], $matches[3], $matches[4]);
