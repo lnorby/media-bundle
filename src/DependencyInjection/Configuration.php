@@ -18,7 +18,7 @@ final class Configuration implements ConfigurationInterface
             ->arrayNode('local')
             ->addDefaultsIfNotSet()
             ->children()
-            ->scalarNode('path')->defaultValue('%kernel.project_dir%/public/media')->end()
+            ->scalarNode('path')->defaultValue('%kernel.project_dir%/%env(PUBLIC_DIRECTORY)%/media')->end()
             ->end()
             ->end()
             ->arrayNode('image')
