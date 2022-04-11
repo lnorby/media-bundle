@@ -53,11 +53,11 @@ class MediaController
                 throw new NotFoundHttpException();
             }
 
-            return $this->downloadManager->downloadModifiedImage($media, $matches[2], $matches[3], $matches[4]);
-//            try {
-//            } catch (\RuntimeException $e) {
-//                throw new NotFoundHttpException();
-//            }
+            try {
+                return $this->downloadManager->downloadModifiedImage($media, $matches[2], $matches[3], $matches[4]);
+            } catch (\RuntimeException $e) {
+                throw new NotFoundHttpException();
+            }
         }
 
         throw new NotFoundHttpException();
