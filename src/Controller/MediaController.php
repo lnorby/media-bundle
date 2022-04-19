@@ -3,19 +3,17 @@
 namespace Lnorby\MediaBundle\Controller;
 
 use Lnorby\MediaBundle\DownloadManager;
-use Lnorby\MediaBundle\Exception\BadImageDimensions;
 use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
-use Lnorby\MediaBundle\Exception\FileAlreadyUploaded;
-use Lnorby\MediaBundle\Exception\InvalidFile;
-use Lnorby\MediaBundle\Exception\NoFile;
-use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
 use Lnorby\MediaBundle\Repository\MediaRepository;
 use Lnorby\MediaBundle\UploadManager;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Validation;
 
 // TODO: translations
 class MediaController
@@ -52,7 +50,7 @@ class MediaController
             } catch (CouldNotFindMedia $e) {
                 throw new NotFoundHttpException();
             }
-            
+
             return $this->downloadManager->downloadModifiedImage($media, $matches[2], $matches[3], $matches[4]);
         }
 
@@ -61,16 +59,25 @@ class MediaController
 
     public function uploadFile(Request $request): Response
     {
+        /**
+         * @var UploadedFile $file
+         */
         $file = $request->files->get('file');
 
+        if (!$file->isValid()) {
+            switch ($file->getError()) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    return $this->errorResponse('A fájlt nem sikerült feltölteni, mert túl nagy a mérete.');
+                case UPLOAD_ERR_NO_FILE:
+                    return $this->errorResponse('Nem adott meg fájlt.');
+                default:
+                    return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
+            }
+        }
+
         try {
-            $media = $this->uploadManager->uploadFile($file);
-        } catch (NoFile $e) {
-            return $this->errorResponse('Nem adott meg fájlt.');
-        } catch (UploadSizeExceeded $e) {
-            return $this->errorResponse('A fájlt nem sikerült feltölteni, mert túl nagy a mérete.');
-        } catch (FileAlreadyUploaded $e) {
-            return $this->errorResponse('A fájlt nem sikerült feltölteni.');
+            $media = $this->uploadManager->uploadFile($file->getClientOriginalName(), $file->getContent(), $file->getMimeType());
         } catch (CouldNotUploadFile $e) {
             return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
@@ -86,22 +93,48 @@ class MediaController
 
     public function uploadImage(Request $request): Response
     {
+        /**
+         * @var UploadedFile $image
+         */
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
 
-        try {
-            $media = $this->uploadManager->uploadImage($image, $minWidth, $minHeight);
-        } catch (NoFile $e) {
-            return $this->errorResponse('Nem adott meg képet.');
-        } catch (InvalidFile $e) {
+        if (!$image->isValid()) {
+            switch ($image->getError()) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    return $this->errorResponse('A képet nem sikerült feltölteni, mert túl nagy a mérete.');
+                case UPLOAD_ERR_NO_FILE:
+                    return $this->errorResponse('Nem adott meg képet.');
+                default:
+                    return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
+            }
+        }
+
+        $validator = Validation::createValidator();
+        $imageConstraints = new Image();
+
+        if (0 !== count($validator->validate($image, [$imageConstraints]))) {
             return $this->errorResponse('A megadott fájl nem kép.');
-        } catch (BadImageDimensions $e) {
-            return $this->errorResponse(sprintf('A képnek legalább %d×%d pixel méretűnek kell lennie.', $minWidth, $minHeight));
-        } catch (UploadSizeExceeded $e) {
-            return $this->errorResponse('A képet nem sikerült feltölteni, mert túl nagy a mérete.');
-        } catch (FileAlreadyUploaded $e) {
-            return $this->errorResponse('A képet nem sikerült feltölteni.');
+        }
+
+        if (0 !== $minWidth) {
+            $imageConstraints->minWidth = $minWidth;
+        }
+
+        if (0 !== $minHeight) {
+            $imageConstraints->minHeight = $minHeight;
+        }
+
+        if ((0 !== $minWidth || 0 !== $minHeight) && 0 !== count($validator->validate($image, [$imageConstraints]))) {
+            return $this->errorResponse(
+                sprintf('A képnek legalább %d×%d pixel méretűnek kell lennie.', $minWidth, $minHeight)
+            );
+        }
+
+        try {
+            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
         } catch (CouldNotUploadFile $e) {
             return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
@@ -119,8 +152,58 @@ class MediaController
         );
     }
 
-    protected function errorResponse(string $message): Response
+    public function uploadImageViaEditor(Request $request): Response
+    {
+        /**
+         * @var UploadedFile $image
+         */
+        $image = $request->files->get('upload');
+
+        if (!$image->isValid()) {
+            switch ($image->getError()) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    return $this->editorErrorResponse('A képet nem sikerült feltölteni, mert túl nagy a mérete.');
+                case UPLOAD_ERR_NO_FILE:
+                    return $this->editorErrorResponse('Nem adott meg képet.');
+                default:
+                    return $this->editorErrorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
+            }
+        }
+
+        $validator = Validation::createValidator();
+        $imageConstraints = new Image();
+
+        if (0 !== count($validator->validate($image, [$imageConstraints]))) {
+            return $this->editorErrorResponse('A megadott fájl nem kép.');
+        }
+
+        try {
+            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
+        } catch (CouldNotUploadFile $e) {
+            return $this->editorErrorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
+        }
+
+        return new JsonResponse(
+            [
+                'url' => $this->downloadManager->generateDownloadUrlForFile($media),
+            ]
+        );
+    }
+
+    private function errorResponse(string $message): Response
     {
         return new Response($message, 422);
+    }
+
+    private function editorErrorResponse(string $message): Response
+    {
+        return new JsonResponse(
+            [
+                'error' => [
+                    'message' => $message,
+                ]
+            ]
+        );
     }
 }

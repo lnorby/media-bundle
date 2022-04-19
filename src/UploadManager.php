@@ -3,17 +3,9 @@
 namespace Lnorby\MediaBundle;
 
 use Lnorby\MediaBundle\Entity\Media;
-use Lnorby\MediaBundle\Exception\BadImageDimensions;
-use Lnorby\MediaBundle\Exception\CouldNotCreateFile;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
-use Lnorby\MediaBundle\Exception\InvalidFile;
-use Lnorby\MediaBundle\Exception\NoFile;
-use Lnorby\MediaBundle\Exception\UploadSizeExceeded;
 use Lnorby\MediaBundle\Storage\Storage;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Validator\Constraints\Image;
-use Symfony\Component\Validator\Validation;
 
 final class UploadManager
 {
@@ -58,9 +50,9 @@ final class UploadManager
     }
 
     /**
-     * @throws CouldNotCreateFile
+     * @throws CouldNotUploadFile
      */
-    public function createFile(string $name, $content, string $mimeType): Media
+    public function uploadFile(string $name, string $content, string $mimeType): Media
     {
         $extension = pathinfo($name, PATHINFO_EXTENSION);
         $path = $this->generateUniqueFilenameWithPath($extension);
@@ -68,7 +60,7 @@ final class UploadManager
         try {
             $this->storage->createFile($path, $content);
         } catch (\Exception $e) {
-            throw new CouldNotCreateFile();
+            throw new CouldNotUploadFile();
         }
 
         return $this->mediaManager->createMedia($path, $this->convertToSafeFilename($name, $extension), $mimeType);
@@ -77,54 +69,13 @@ final class UploadManager
     /**
      * @throws CouldNotUploadFile
      */
-    public function uploadFile(UploadedFile $file): Media
+    public function uploadImage(string $name, string $content): Media
     {
-        $this->validateFile($file);
-
-        $path = $this->generateUniqueFilenameWithPath($file->getClientOriginalExtension());
-
-        try {
-            $this->storage->createFile($path, $file->getContent());
-        } catch (\Exception $e) {
-            throw new CouldNotUploadFile();
-        }
-
-        $name = $this->convertToSafeFilename($file->getClientOriginalName(), $file->getClientOriginalExtension());
-        $mimeType = $file->getMimeType();
-
-        return $this->mediaManager->createMedia($path, $name, $mimeType);
-    }
-
-    /**
-     * @throws CouldNotUploadFile
-     */
-    public function uploadImage(UploadedFile $image, int $minWidth = 0, int $minHeight = 0): Media
-    {
-        $this->validateFile($image);
-
-        $validator = Validation::createValidator();
-        $imageConstraints = new Image();
-
-        if (0 !== count($validator->validate($image, [$imageConstraints]))) {
-            throw new InvalidFile();
-        }
-
-        if (0 !== $minWidth) {
-            $imageConstraints->minWidth = $minWidth;
-        }
-
-        if (0 !== $minHeight) {
-            $imageConstraints->minHeight = $minHeight;
-        }
-
-        if ((0 !== $minWidth || 0 !== $minHeight) && 0 !== count($validator->validate($image, [$imageConstraints]))) {
-            throw new BadImageDimensions();
-        }
-
         $path = $this->generateUniqueFilenameWithPath('jpg');
 
+        // TODO: transparent png background problem
         try {
-            $imageManipulator = new ImageManipulator($image->getContent());
+            $imageManipulator = new ImageManipulator($content);
             $imageManipulator->resize($this->imageWidth, $this->imageHeight);
             $imageManipulator->setQuality($this->quality);
             $imageManipulator->setFormat(ImageManipulator::FORMAT_JPEG);
@@ -135,25 +86,7 @@ final class UploadManager
             throw new CouldNotUploadFile();
         }
 
-        $name = $this->convertToSafeFilename($image->getClientOriginalName(), 'jpg');
-        $mimeType = 'image/jpeg';
-
-        return $this->mediaManager->createMedia($path, $name, $mimeType);
-    }
-
-    private function validateFile(UploadedFile $file): void
-    {
-        if (!$file->isValid()) {
-            switch ($file->getError()) {
-                case UPLOAD_ERR_INI_SIZE:
-                case UPLOAD_ERR_FORM_SIZE:
-                    throw new UploadSizeExceeded();
-                case UPLOAD_ERR_NO_FILE:
-                    throw new NoFile();
-                default:
-                    throw new CouldNotUploadFile();
-            }
-        }
+        return $this->mediaManager->createMedia($path, $this->convertToSafeFilename($name, 'jpg'), 'image/jpeg');
     }
 
     private function generateUniqueFilenameWithPath(string $extension): string

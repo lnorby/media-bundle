@@ -8,6 +8,11 @@ lnorby_media_upload_image:
     controller: Lnorby\MediaBundle\Controller\MediaController::uploadImage
     methods: POST
 
+lnorby_media_upload_image_via_editor:
+    path: /upload/image-via-editor
+    controller: Lnorby\MediaBundle\Controller\MediaController::uploadImageViaEditor
+    methods: POST
+
 lnorby_media_download:
     path: /{path<.+>}
     controller: Lnorby\MediaBundle\Controller\MediaController::download
