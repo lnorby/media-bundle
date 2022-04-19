@@ -51,7 +51,11 @@ final class ImageManipulator
 
     public function execute(): string
     {
-        return (string)$this->image->encode($this->format, $this->quality);
+//        return (string)$this->image->encode($this->format, $this->quality);
+
+        return ImageManagerStatic::canvas($this->image->getWidth(), $this->image->getHeight(), 'ffffff')
+            ->insert($this->image)
+            ->encode($this->format, $this->quality);
     }
 
     public function resize(?int $width, ?int $height): void

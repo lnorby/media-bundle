@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
 // TODO: translations
-class MediaController
+final class MediaController
 {
     /**
      * @var UploadManager
