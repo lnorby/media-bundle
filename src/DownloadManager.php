@@ -34,7 +34,8 @@ final class DownloadManager
             'lnorby_media_download',
             [
                 'path' => $media->getPath(),
-            ]
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
         );
     }
 
@@ -44,7 +45,8 @@ final class DownloadManager
             'lnorby_media_download',
             [
                 'path' => $this->getModifiedImagePath($media, $width, $height, $mode),
-            ]
+            ],
+            UrlGeneratorInterface::ABSOLUTE_URL
         );
     }
 

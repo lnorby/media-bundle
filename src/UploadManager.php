@@ -73,7 +73,6 @@ final class UploadManager
     {
         $path = $this->generateUniqueFilenameWithPath('jpg');
 
-        // TODO: transparent png background problem
         try {
             $imageManipulator = new ImageManipulator($content);
             $imageManipulator->resize($this->imageWidth, $this->imageHeight);
@@ -82,7 +81,7 @@ final class UploadManager
             $optimizedImage = $imageManipulator->execute();
 
             $this->storage->createFile($path, $optimizedImage);
-        } catch (\Exception $e) {
+        } catch (\RuntimeException $e) {
             throw new CouldNotUploadFile();
         }
 
