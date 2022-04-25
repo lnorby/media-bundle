@@ -7,6 +7,7 @@ use Lnorby\MediaBundle\Storage\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+// TODO: url generation should be at storage level
 final class DownloadManager
 {
     public const IMAGE_RESIZE = 'r';
