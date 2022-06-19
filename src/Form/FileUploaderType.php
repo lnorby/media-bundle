@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class FileUploaderType extends AbstractType
 {
@@ -34,7 +35,19 @@ final class FileUploaderType extends AbstractType
          */
         $media = $form->getData();
 
+        $view->vars['deletable'] = $options['deletable'];
         $view->vars['file_name'] = $media instanceof Media ? $media->getName() : '';
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'deletable' => true,
+            ]
+        );
+
+        $resolver->setAllowedTypes('deletable', 'bool');
     }
 
     public function getParent()
