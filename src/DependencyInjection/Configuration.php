@@ -21,12 +21,14 @@ final class Configuration implements ConfigurationInterface
             ->scalarNode('path')->defaultValue('%kernel.project_dir%/%env(PUBLIC_DIRECTORY)%/media')->end()
             ->end()
             ->end()
+            ->end()
             ->arrayNode('image')
             ->addDefaultsIfNotSet()
             ->children()
             ->scalarNode('width')->defaultValue(1920)->end()
             ->scalarNode('height')->defaultValue(1920)->end()
             ->scalarNode('quality')->defaultValue(80)->end()
+            ->end()
             ->end()
             ->end();
 
