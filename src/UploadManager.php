@@ -5,7 +5,6 @@ namespace Lnorby\MediaBundle;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
 use Lnorby\MediaBundle\Storage\Storage;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 final class UploadManager
@@ -53,48 +52,40 @@ final class UploadManager
     /**
      * @throws CouldNotUploadFile
      */
-    public function uploadFile(UploadedFile $file): Media
+    public function uploadFile(string $name, string $path, string $mimeType): Media
     {
-        $extension = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-        $path = $this->generateUniqueFilenameWithPath($extension);
+        $extension = pathinfo($name, PATHINFO_EXTENSION);
+        $newPath = $this->generateUniqueFilenameWithPath($extension);
 
         try {
-            $this->storage->createFile($path, $file->getContent());
+            $this->storage->createFile($newPath, file_get_contents($path));
         } catch (\Exception $e) {
             throw new CouldNotUploadFile();
         }
 
-        return $this->mediaManager->createMedia(
-            $path,
-            $this->convertToSafeFilename($file->getClientOriginalName(), $extension),
-            $file->getMimeType()
-        );
+        return $this->mediaManager->createMedia($newPath, $this->convertToSafeFilename($name, $extension), $mimeType);
     }
 
     /**
      * @throws CouldNotUploadFile
      */
-    public function uploadImage(UploadedFile $image): Media
+    public function uploadImage(string $name, string $path): Media
     {
-        $path = $this->generateUniqueFilenameWithPath('jpg');
+        $newPath = $this->generateUniqueFilenameWithPath('jpg');
 
         try {
-            $imageManipulator = new ImageManipulator($image->getRealPath());
+            $imageManipulator = new ImageManipulator($path);
             $imageManipulator->resize($this->imageWidth, $this->imageHeight);
             $imageManipulator->setQuality($this->quality);
             $imageManipulator->setFormat(ImageManipulator::FORMAT_JPEG);
             $optimizedImage = $imageManipulator->execute();
 
-            $this->storage->createFile($path, $optimizedImage);
+            $this->storage->createFile($newPath, $optimizedImage);
         } catch (\RuntimeException $e) {
             throw new CouldNotUploadFile();
         }
 
-        return $this->mediaManager->createMedia(
-            $path,
-            $this->convertToSafeFilename($image->getClientOriginalName(), 'jpg'),
-            'image/jpeg'
-        );
+        return $this->mediaManager->createMedia($newPath, $this->convertToSafeFilename($name, 'jpg'), 'image/jpeg');
     }
 
     private function generateUniqueFilenameWithPath(string $extension): string
