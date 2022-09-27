@@ -30,7 +30,6 @@ final class MediaExtension extends AbstractExtension
     {
         return [
             new TwigFunction('media_file', [$this, 'file']),
-            new TwigFunction('media_image', [$this, 'image']),
             new TwigFunction('media_resized_image', [$this, 'resizedImage']),
             new TwigFunction('media_cropped_image', [$this, 'croppedImage']),
         ];
