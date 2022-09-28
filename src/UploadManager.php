@@ -60,7 +60,7 @@ final class UploadManager
         try {
             $this->storage->createFile($newPath, file_get_contents($path));
         } catch (\Exception $e) {
-            throw new CouldNotUploadFile();
+            throw new CouldNotUploadFile('', 0, $e);
         }
 
         return $this->mediaManager->createMedia($newPath, $this->convertToSafeFilename($name, $extension), $mimeType);
@@ -82,7 +82,7 @@ final class UploadManager
 
             $this->storage->createFile($newPath, $optimizedImage);
         } catch (\RuntimeException $e) {
-            throw new CouldNotUploadFile();
+            throw new CouldNotUploadFile('', 0, $e);
         }
 
         return $this->mediaManager->createMedia($newPath, $this->convertToSafeFilename($name, 'jpg'), 'image/jpeg');
