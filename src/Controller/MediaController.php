@@ -79,7 +79,7 @@ final class MediaController
         try {
             $media = $this->uploadManager->uploadFile(
                 $file->getClientOriginalName(),
-                $file->getRealPath(),
+                $file->getContent(),
                 $file->getMimeType()
             );
         } catch (CouldNotUploadFile $e) {
@@ -138,7 +138,7 @@ final class MediaController
         }
 
         try {
-            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getRealPath());
+            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
         } catch (CouldNotUploadFile $e) {
             return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
         }
@@ -183,7 +183,7 @@ final class MediaController
         }
 
         try {
-            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getRealPath());
+            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
         } catch (CouldNotUploadFile $e) {
             return $this->editorErrorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
         }

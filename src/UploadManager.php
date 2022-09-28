@@ -52,40 +52,44 @@ final class UploadManager
     /**
      * @throws CouldNotUploadFile
      */
-    public function uploadFile(string $name, string $path, string $mimeType): Media
+    public function uploadFile(string $name, string $content, string $mimeType): Media
     {
         $extension = pathinfo($name, PATHINFO_EXTENSION);
-        $newPath = $this->generateUniqueFilenameWithPath($extension);
+        $path = $this->generateUniqueFilenameWithPath($extension);
 
         try {
-            $this->storage->createFile($newPath, file_get_contents($path));
+            $this->storage->createFile($path, $content);
         } catch (\Exception $e) {
             throw new CouldNotUploadFile('', 0, $e);
         }
 
-        return $this->mediaManager->createMedia($newPath, $this->convertToSafeFilename($name, $extension), $mimeType);
+        return $this->mediaManager->createMedia($path, $this->convertToSafeFilename($name, $extension), $mimeType);
     }
 
     /**
      * @throws CouldNotUploadFile
      */
-    public function uploadImage(string $name, string $path): Media
+    public function uploadImage(string $name, string $content): Media
     {
-        $newPath = $this->generateUniqueFilenameWithPath('jpg');
+        $path = $this->generateUniqueFilenameWithPath('jpg');
 
         try {
-            $imageManipulator = new ImageManipulator($path);
+            $imageManipulator = new ImageManipulator($content);
             $imageManipulator->resize($this->imageWidth, $this->imageHeight);
             $imageManipulator->setQuality($this->quality);
             $imageManipulator->setFormat(ImageManipulator::FORMAT_JPEG);
             $optimizedImage = $imageManipulator->execute();
 
-            $this->storage->createFile($newPath, $optimizedImage);
+            $this->storage->createFile($path, $optimizedImage);
         } catch (\RuntimeException $e) {
             throw new CouldNotUploadFile('', 0, $e);
         }
 
-        return $this->mediaManager->createMedia($newPath, $this->convertToSafeFilename($name, 'jpg'), 'image/jpeg');
+        return $this->mediaManager->createMedia(
+            $path,
+            $this->convertToSafeFilename($name, 'jpg'),
+            'image/jpeg'
+        );
     }
 
     private function generateUniqueFilenameWithPath(string $extension): string
