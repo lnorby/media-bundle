@@ -33,7 +33,7 @@ final class DownloadManager
         return $this->urlGenerator->generate(
             'lnorby_media_download',
             [
-                'path' => $media->getPath(),
+                'path' => $media->path(),
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
@@ -52,11 +52,11 @@ final class DownloadManager
 
     public function downloadFile(Media $media): BinaryFileResponse
     {
-        if (!$this->storage->fileExists($media->getPath())) {
+        if (!$this->storage->fileExists($media->path())) {
             throw new \RuntimeException('File does not exist.');
         }
 
-        return $this->createFileResponse($media->getPath());
+        return $this->createFileResponse($media->path());
     }
 
     public function downloadModifiedImage(Media $media, int $width, int $height, string $mode): BinaryFileResponse
@@ -68,7 +68,7 @@ final class DownloadManager
                 throw new \RuntimeException('Media is not an image.');
             }
 
-            $imageManipulator = new ImageManipulator($this->storage->getRealPath($media->getPath()));
+            $imageManipulator = new ImageManipulator($this->storage->getRealPath($media->path()));
 
             if (self::IMAGE_RESIZE === $mode) {
                 $imageManipulator->resize($width, $height);
@@ -87,12 +87,12 @@ final class DownloadManager
     {
         return sprintf(
             '%s/%s.%dx%d%s.%s',
-            pathinfo($media->getPath(), PATHINFO_DIRNAME),
-            pathinfo($media->getPath(), PATHINFO_FILENAME),
+            pathinfo($media->path(), PATHINFO_DIRNAME),
+            pathinfo($media->path(), PATHINFO_FILENAME),
             $width,
             $height,
             $mode,
-            pathinfo($media->getPath(), PATHINFO_EXTENSION)
+            pathinfo($media->path(), PATHINFO_EXTENSION)
         );
     }
 

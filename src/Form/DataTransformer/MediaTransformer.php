@@ -26,7 +26,7 @@ final class MediaTransformer implements DataTransformerInterface
             return '';
         }
 
-        return $media->getId();
+        return $media->id();
     }
 
     public function reverseTransform($mediaId)

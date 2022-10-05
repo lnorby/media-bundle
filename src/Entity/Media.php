@@ -31,22 +31,22 @@ class Media
         $this->mimeType = $mimeType;
     }
 
-    public function getId(): int
+    public function id(): int
     {
         return $this->id;
     }
 
-    public function getPath(): string
+    public function path(): string
     {
         return $this->path;
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function getMimeType(): string
+    public function mimeType(): string
     {
         return $this->mimeType;
     }

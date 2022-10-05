@@ -100,8 +100,8 @@ final class MediaController
 
         return new JsonResponse(
             [
-                'id' => $media->getId(),
-                'name' => $media->getName(),
+                'id' => $media->id(),
+                'name' => $media->name(),
                 'url' => $this->downloadManager->generateDownloadUrlForFile($media),
             ]
         );
@@ -144,7 +144,7 @@ final class MediaController
 
         return new JsonResponse(
             [
-                'id' => $media->getId(),
+                'id' => $media->id(),
                 'url' => $this->downloadManager->generateDownloadUrlForModifiedImage(
                     $media,
                     250,

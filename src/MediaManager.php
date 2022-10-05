@@ -41,15 +41,15 @@ final class MediaManager
     {
         $pattern = sprintf(
             '%s/%s.*.%s',
-            pathinfo($media->getPath(), PATHINFO_DIRNAME),
-            pathinfo($media->getPath(), PATHINFO_FILENAME),
-            pathinfo($media->getPath(), PATHINFO_EXTENSION)
+            pathinfo($media->path(), PATHINFO_DIRNAME),
+            pathinfo($media->path(), PATHINFO_FILENAME),
+            pathinfo($media->path(), PATHINFO_EXTENSION)
         );
 
         foreach ($this->storage->search($pattern) as $file) {
             $this->storage->deleteFile($file);
         }
 
-        $this->storage->deleteFile($media->getPath());
+        $this->storage->deleteFile($media->path());
     }
 }

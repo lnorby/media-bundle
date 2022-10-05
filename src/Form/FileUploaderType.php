@@ -36,7 +36,7 @@ final class FileUploaderType extends AbstractType
         $media = $form->getData();
 
         $view->vars['deletable'] = $options['deletable'];
-        $view->vars['file_name'] = $media instanceof Media ? $media->getName() : '';
+        $view->vars['file_name'] = $media instanceof Media ? $media->name() : '';
     }
 
     public function configureOptions(OptionsResolver $resolver)
