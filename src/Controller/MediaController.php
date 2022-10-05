@@ -173,7 +173,7 @@ final class MediaController
 
     private function errorResponse(string $message, array $params = []): Response
     {
-        return new Response($this->translator->trans($message, $params), 422);
+        return new Response($this->translator->trans($message, $params, 'validators'), 422);
     }
 
     private function editorErrorResponse(string $message, array $params = []): Response
@@ -181,7 +181,7 @@ final class MediaController
         return new JsonResponse(
             [
                 'error' => [
-                    'message' => $this->translator->trans($message, $params),
+                    'message' => $this->translator->trans($message, $params, 'validators'),
                 ]
             ]
         );
