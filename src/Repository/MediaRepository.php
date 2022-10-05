@@ -3,6 +3,7 @@
 namespace Lnorby\MediaBundle\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NoResultException;
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
 
@@ -46,8 +47,8 @@ final class MediaRepository
                 ->createQuery($dql)
                 ->setParameter('id', $id)
                 ->getSingleResult();
-        } catch (\Exception $e) {
-            throw new CouldNotFindMedia('', 0, $e);
+        } catch (NoResultException $e) {
+            throw CouldNotFindMedia::withId($id);
         }
     }
 
@@ -67,8 +68,8 @@ final class MediaRepository
                 ->createQuery($dql)
                 ->setParameter('path', $path)
                 ->getSingleResult();
-        } catch (\Exception $e) {
-            throw new CouldNotFindMedia('', 0, $e);
+        } catch (NoResultException $e) {
+            throw CouldNotFindMedia::withPath($path);
         }
     }
 }

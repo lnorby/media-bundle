@@ -76,16 +76,11 @@ final class MediaController
          * @var UploadedFile $file
          */
         $file = $request->files->get('file');
-        $locale = $request->request->get('locale', 'hu');
 
         $violations = $this->validator->validate($file, [new File()]);
 
         if ($violations->count() > 0) {
-            return $this->errorResponse(
-                $violations->get(0)->getMessage(),
-                $violations->get(0)->getParameters(),
-                $locale
-            );
+            return $this->errorResponse($violations->get(0)->getMessage(), $violations->get(0)->getParameters());
         }
 
         try {
@@ -95,7 +90,7 @@ final class MediaController
                 $file->getMimeType()
             );
         } catch (CouldNotUploadFile $e) {
-            return $this->errorResponse('The file could not be uploaded.', [], $locale);
+            return $this->errorResponse('The file could not be uploaded.');
         }
 
         return new JsonResponse(
@@ -115,7 +110,6 @@ final class MediaController
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
-        $locale = $request->request->get('locale', 'hu');
 
         $violations = $this->validator->validate(
             $image,
@@ -129,17 +123,13 @@ final class MediaController
         );
 
         if ($violations->count() > 0) {
-            return $this->errorResponse(
-                $violations->get(0)->getMessage(),
-                $violations->get(0)->getParameters(),
-                $locale
-            );
+            return $this->errorResponse($violations->get(0)->getMessage(), $violations->get(0)->getParameters());
         }
 
         try {
             $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
         } catch (CouldNotUploadFile $e) {
-            return $this->errorResponse('The file could not be uploaded.', [], $locale);
+            return $this->errorResponse('The file could not be uploaded.');
         }
 
         return new JsonResponse(
@@ -161,7 +151,6 @@ final class MediaController
          * @var UploadedFile $image
          */
         $image = $request->files->get('upload');
-        $locale = $request->request->get('locale', 'hu');
 
         $violations = $this->validator->validate($image, [new File(), new Image()]);
 
@@ -176,7 +165,7 @@ final class MediaController
         try {
             $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
         } catch (CouldNotUploadFile $e) {
-            return $this->editorErrorResponse('The file could not be uploaded.', [], $locale);
+            return $this->editorErrorResponse('The file could not be uploaded.');
         }
 
         return new JsonResponse(
@@ -186,17 +175,17 @@ final class MediaController
         );
     }
 
-    private function errorResponse(string $message, array $params, string $locale): Response
+    private function errorResponse(string $message, array $params = []): Response
     {
-        return new Response($this->translator->trans($message, $params, null, $locale), 422);
+        return new Response($this->translator->trans($message, $params), 422);
     }
 
-    private function editorErrorResponse(string $message, array $params, string $locale): Response
+    private function editorErrorResponse(string $message, array $params = []): Response
     {
         return new JsonResponse(
             [
                 'error' => [
-                    'message' => $this->translator->trans($message, $params, null, $locale),
+                    'message' => $this->translator->trans($message, $params),
                 ]
             ]
         );
