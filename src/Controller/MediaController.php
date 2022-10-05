@@ -104,7 +104,6 @@ final class MediaController
 
     public function uploadImage(Request $request): Response
     {
-        dd($request->getLocale());
         /**
          * @var UploadedFile $image
          */
@@ -156,11 +155,7 @@ final class MediaController
         $violations = $this->validator->validate($image, [new File(), new Image()]);
 
         if ($violations->count() > 0) {
-            return $this->editorErrorResponse(
-                $violations->get(0)->getMessage(),
-                $violations->get(0)->getParameters(),
-                $locale
-            );
+            return $this->editorErrorResponse($violations->get(0)->getMessage(), $violations->get(0)->getParameters());
         }
 
         try {
