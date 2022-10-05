@@ -16,7 +16,7 @@
         <service id="Lnorby\MediaBundle\Storage\Storage" alias="Lnorby\MediaBundle\Storage\LocalStorage"/>
         <service id="Lnorby\MediaBundle\MediaManager">
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
-            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
         </service>
         <service id="Lnorby\MediaBundle\DownloadManager">
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
@@ -36,14 +36,14 @@
         </service>
         <service id="Lnorby\MediaBundle\Twig\MediaExtension">
             <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
-            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
             <tag name="twig.extension"/>
         </service>
         <service id="Lnorby\MediaBundle\Repository\MediaRepository">
             <argument type="service" id="doctrine.orm.entity_manager"/>
         </service>
         <service id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer">
-            <argument type="service" id="doctrine.orm.entity_manager"/>
+            <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
         </service>
         <service id="Lnorby\MediaBundle\Form\FileUploaderType">
             <argument type="service" id="Lnorby\MediaBundle\Form\DataTransformer\MediaTransformer"/>

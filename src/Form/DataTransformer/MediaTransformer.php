@@ -2,21 +2,22 @@
 
 namespace Lnorby\MediaBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Lnorby\MediaBundle\Entity\Media;
+use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
+use Lnorby\MediaBundle\Repository\MediaRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 final class MediaTransformer implements DataTransformerInterface
 {
     /**
-     * @var EntityManagerInterface
+     * @var MediaRepository
      */
-    private $entityManager;
+    private $mediaRepository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(MediaRepository $mediaRepository)
     {
-        $this->entityManager = $entityManager;
+        $this->mediaRepository = $mediaRepository;
     }
 
     public function transform($media)
@@ -34,9 +35,9 @@ final class MediaTransformer implements DataTransformerInterface
             return null;
         }
 
-        $media = $this->entityManager->find(Media::class, $mediaId);
-
-        if (!$media instanceof Media) {
+        try {
+            $media = $this->mediaRepository->getById((int)$mediaId);
+        } catch (CouldNotFindMedia $e) {
             throw new TransformationFailedException('Media does not exist.');
         }
 

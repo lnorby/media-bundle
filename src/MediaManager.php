@@ -2,8 +2,8 @@
 
 namespace Lnorby\MediaBundle;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Lnorby\MediaBundle\Entity\Media;
+use Lnorby\MediaBundle\Repository\MediaRepository;
 use Lnorby\MediaBundle\Storage\Storage;
 
 final class MediaManager
@@ -14,30 +14,27 @@ final class MediaManager
     private $storage;
 
     /**
-     * @var EntityManagerInterface
+     * @var MediaRepository
      */
-    private $entityManager;
+    private $mediaRepository;
 
-    public function __construct(Storage $storage, EntityManagerInterface $entityManager)
+    public function __construct(Storage $storage, MediaRepository $mediaRepository)
     {
         $this->storage = $storage;
-        $this->entityManager = $entityManager;
+        $this->mediaRepository = $mediaRepository;
     }
 
     public function createMedia(string $path, string $originalName, string $mimeType): Media
     {
         $media = new Media($path, $originalName, $mimeType);
-
-        $this->entityManager->persist($media);
-        $this->entityManager->flush();
+        $this->mediaRepository->add($media);
 
         return $media;
     }
 
     public function deleteMedia(Media $media): void
     {
-        $this->entityManager->remove($media);
-        $this->entityManager->flush();
+        $this->mediaRepository->remove($media);
     }
 
     public function deleteFiles(Media $media): void

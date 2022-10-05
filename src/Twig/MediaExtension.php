@@ -2,9 +2,10 @@
 
 namespace Lnorby\MediaBundle\Twig;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Lnorby\MediaBundle\DownloadManager;
 use Lnorby\MediaBundle\Entity\Media;
+use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
+use Lnorby\MediaBundle\Repository\MediaRepository;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -16,14 +17,14 @@ final class MediaExtension extends AbstractExtension
     private $downloadManager;
 
     /**
-     * @var EntityManagerInterface
+     * @var MediaRepository
      */
-    private $entityManager;
+    private $mediaRepository;
 
-    public function __construct(DownloadManager $downloadManager, EntityManagerInterface $entityManager)
+    public function __construct(DownloadManager $downloadManager, MediaRepository $mediaRepository)
     {
         $this->downloadManager = $downloadManager;
-        $this->entityManager = $entityManager;
+        $this->mediaRepository = $mediaRepository;
     }
 
     public function getFunctions(): array
@@ -38,11 +39,11 @@ final class MediaExtension extends AbstractExtension
     public function file($media): string
     {
         if (!$media instanceof Media) {
-            $media = $this->entityManager->find(Media::class, $media);
-        }
-
-        if (!$media instanceof Media) {
-            return '';
+            try {
+                $media = $this->mediaRepository->getById((int)$media);
+            } catch (CouldNotFindMedia $e) {
+                return '';
+            }
         }
 
         return $this->downloadManager->generateDownloadUrlForFile($media);
@@ -51,11 +52,11 @@ final class MediaExtension extends AbstractExtension
     public function resizedImage($media, int $width, int $height): string
     {
         if (!$media instanceof Media) {
-            $media = $this->entityManager->find(Media::class, $media);
-        }
-
-        if (!$media instanceof Media) {
-            return '';
+            try {
+                $media = $this->mediaRepository->getById((int)$media);
+            } catch (CouldNotFindMedia $e) {
+                return '';
+            }
         }
 
         return $this->downloadManager->generateDownloadUrlForModifiedImage(
@@ -69,11 +70,11 @@ final class MediaExtension extends AbstractExtension
     public function croppedImage($media, int $width, int $height): string
     {
         if (!$media instanceof Media) {
-            $media = $this->entityManager->find(Media::class, $media);
-        }
-
-        if (!$media instanceof Media) {
-            return '';
+            try {
+                $media = $this->mediaRepository->getById((int)$media);
+            } catch (CouldNotFindMedia $e) {
+                return '';
+            }
         }
 
         return $this->downloadManager->generateDownloadUrlForModifiedImage(

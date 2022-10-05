@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
@@ -64,16 +65,21 @@ final class MediaController
          */
         $file = $request->files->get('file');
 
-        if (!$file->isValid()) {
-            switch ($file->getError()) {
-                case UPLOAD_ERR_INI_SIZE:
-                case UPLOAD_ERR_FORM_SIZE:
-                    return $this->errorResponse('A fájlt nem sikerült feltölteni, mert túl nagy a mérete.');
-                case UPLOAD_ERR_NO_FILE:
-                    return $this->errorResponse('Nem adott meg fájlt.');
-                default:
-                    return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
-            }
+        $validator = Validation::createValidator();
+        $violations = $validator->validate(
+            $file,
+            [
+                new File([
+                    'uploadIniSizeErrorMessage' => 'A fájlt nem sikerült feltölteni, mert túl nagy a mérete.',
+                    'uploadFormSizeErrorMessage' => 'A fájlt nem sikerült feltölteni, mert túl nagy a mérete.',
+                    'uploadNoFileErrorMessage' => 'Nem adott meg fájlt.',
+                    'uploadErrorMessage' => 'A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!',
+                ])
+            ]
+        );
+
+        if ($violations->count() > 0) {
+            return $this->errorResponse($violations->get(0)->getMessage());
         }
 
         try {
@@ -104,37 +110,29 @@ final class MediaController
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
 
-        if (!$image->isValid()) {
-            switch ($image->getError()) {
-                case UPLOAD_ERR_INI_SIZE:
-                case UPLOAD_ERR_FORM_SIZE:
-                    return $this->errorResponse('A képet nem sikerült feltölteni, mert túl nagy a mérete.');
-                case UPLOAD_ERR_NO_FILE:
-                    return $this->errorResponse('Nem adott meg képet.');
-                default:
-                    return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
-            }
-        }
-
         $validator = Validation::createValidator();
-        $imageConstraints = new Image();
+        $violations = $validator->validate(
+            $image,
+            [
+                new File([
+                    'uploadIniSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
+                    'uploadFormSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
+                    'uploadNoFileErrorMessage' => 'Nem adott meg képet.',
+                    'uploadErrorMessage' => 'A képet nem sikerült feltölteni. Kérjük, próbálja újra!',
+                ]),
+                new Image([
+                    'minHeight' => $minHeight,
+                    'minHeightMessage' => sprintf('A képnek legalább %d pixel magasságúnak kell lennie.', $minHeight),
+                    'minWidth' => $minWidth,
+                    'minWidthMessage' => sprintf('A képnek legalább %d pixel szélességűnek kell lennie.', $minWidth),
+                    'mimeTypesMessage' => 'A megadott fájl nem kép.',
+                    'sizeNotDetectedMessage' => 'A megadott fájl nem kép.',
+                ]),
+            ]
+        );
 
-        if (0 !== count($validator->validate($image, [$imageConstraints]))) {
-            return $this->errorResponse('A megadott fájl nem kép.');
-        }
-
-        if (0 !== $minWidth) {
-            $imageConstraints->minWidth = $minWidth;
-        }
-
-        if (0 !== $minHeight) {
-            $imageConstraints->minHeight = $minHeight;
-        }
-
-        if ((0 !== $minWidth || 0 !== $minHeight) && 0 !== count($validator->validate($image, [$imageConstraints]))) {
-            return $this->errorResponse(
-                sprintf('A képnek legalább %d×%d pixel méretűnek kell lennie.', $minWidth, $minHeight)
-            );
+        if ($violations->count() > 0) {
+            return $this->errorResponse($violations->get(0)->getMessage());
         }
 
         try {
@@ -163,23 +161,25 @@ final class MediaController
          */
         $image = $request->files->get('upload');
 
-        if (!$image->isValid()) {
-            switch ($image->getError()) {
-                case UPLOAD_ERR_INI_SIZE:
-                case UPLOAD_ERR_FORM_SIZE:
-                    return $this->editorErrorResponse('A képet nem sikerült feltölteni, mert túl nagy a mérete.');
-                case UPLOAD_ERR_NO_FILE:
-                    return $this->editorErrorResponse('Nem adott meg képet.');
-                default:
-                    return $this->editorErrorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
-            }
-        }
-
         $validator = Validation::createValidator();
-        $imageConstraints = new Image();
+        $violations = $validator->validate(
+            $image,
+            [
+                new File([
+                    'uploadIniSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
+                    'uploadFormSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
+                    'uploadNoFileErrorMessage' => 'Nem adott meg képet.',
+                    'uploadErrorMessage' => 'A képet nem sikerült feltölteni. Kérjük, próbálja újra!',
+                ]),
+                new Image([
+                    'mimeTypesMessage' => 'A megadott fájl nem kép.',
+                    'sizeNotDetectedMessage' => 'A megadott fájl nem kép.',
+                ]),
+            ]
+        );
 
-        if (0 !== count($validator->validate($image, [$imageConstraints]))) {
-            return $this->editorErrorResponse('A megadott fájl nem kép.');
+        if ($violations->count() > 0) {
+            return $this->errorResponse($violations->get(0)->getMessage());
         }
 
         try {

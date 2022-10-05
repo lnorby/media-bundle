@@ -18,10 +18,43 @@ final class MediaRepository
         $this->entityManager = $entityManager;
     }
 
+    public function add(Media $media): void
+    {
+        $this->entityManager->persist($media);
+        $this->entityManager->flush();
+    }
+
+    public function remove(Media $media): void
+    {
+        $this->entityManager->remove($media);
+        $this->entityManager->flush();
+    }
+
     /**
      * @throws CouldNotFindMedia
      */
-    public function getByPath($path): Media
+    public function getById(int $id): Media
+    {
+        $dql = '
+            SELECT m
+            FROM Lnorby\MediaBundle\Entity\Media m
+            WHERE m.id = :id
+        ';
+
+        try {
+            return $this->entityManager
+                ->createQuery($dql)
+                ->setParameter('id', $id)
+                ->getSingleResult();
+        } catch (\Exception $e) {
+            throw new CouldNotFindMedia('', 0, $e);
+        }
+    }
+
+    /**
+     * @throws CouldNotFindMedia
+     */
+    public function getByPath(string $path): Media
     {
         $dql = '
             SELECT m
