@@ -24,7 +24,9 @@
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
             <argument type="service" id="router.default"/>
         </service>
-        <service id="Lnorby\MediaBundle\ErrorMessageTranslator"/>
+        <service id="Lnorby\MediaBundle\ErrorMessageTranslator">
+            <argument type="service" id="translator.default"/>
+        </service>
         <service id="Lnorby\MediaBundle\UploadManager">
             <argument/>
             <argument/>
