@@ -3,6 +3,7 @@
 namespace Lnorby\MediaBundle\Controller;
 
 use Lnorby\MediaBundle\DownloadManager;
+use Lnorby\MediaBundle\ErrorMessageTranslator;
 use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
 use Lnorby\MediaBundle\Repository\MediaRepository;
@@ -16,7 +17,6 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validation;
 
-// TODO: translations
 final class MediaController
 {
     /**
@@ -34,11 +34,17 @@ final class MediaController
      */
     private $mediaRepository;
 
-    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository)
+    /**
+     * @var ErrorMessageTranslator
+     */
+    private $errorMessageTranslator;
+
+    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository, ErrorMessageTranslator $errorMessageTranslator)
     {
         $this->uploadManager = $uploadManager;
         $this->downloadManager = $downloadManager;
         $this->mediaRepository = $mediaRepository;
+        $this->errorMessageTranslator = $errorMessageTranslator;
     }
 
     public function download(Request $request): Response
@@ -64,22 +70,17 @@ final class MediaController
          * @var UploadedFile $file
          */
         $file = $request->files->get('file');
+        $locale = $request->request->get('locale', 'hu');
 
         $validator = Validation::createValidator();
-        $violations = $validator->validate(
-            $file,
-            [
-                new File([
-                    'uploadIniSizeErrorMessage' => 'A fájlt nem sikerült feltölteni, mert túl nagy a mérete.',
-                    'uploadFormSizeErrorMessage' => 'A fájlt nem sikerült feltölteni, mert túl nagy a mérete.',
-                    'uploadNoFileErrorMessage' => 'Nem adott meg fájlt.',
-                    'uploadErrorMessage' => 'A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!',
-                ])
-            ]
-        );
+        $violations = $validator->validate($file, [new File()]);
 
         if ($violations->count() > 0) {
-            return $this->errorResponse($violations->get(0)->getMessage());
+            return $this->errorResponse(
+                $violations->get(0)->getMessage(),
+                $violations->get(0)->getParameters(),
+                $locale
+            );
         }
 
         try {
@@ -89,7 +90,7 @@ final class MediaController
                 $file->getMimeType()
             );
         } catch (CouldNotUploadFile $e) {
-            return $this->errorResponse('A fájlt nem sikerült feltölteni. Kérjük, próbálja újra!');
+            return $this->errorResponse('The file could not be uploaded.', [], $locale);
         }
 
         return new JsonResponse(
@@ -109,36 +110,32 @@ final class MediaController
         $image = $request->files->get('image');
         $minWidth = $request->request->getInt('min_width');
         $minHeight = $request->request->getInt('min_height');
+        $locale = $request->request->get('locale', 'hu');
 
         $validator = Validation::createValidator();
         $violations = $validator->validate(
             $image,
             [
-                new File([
-                    'uploadIniSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
-                    'uploadFormSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
-                    'uploadNoFileErrorMessage' => 'Nem adott meg képet.',
-                    'uploadErrorMessage' => 'A képet nem sikerült feltölteni. Kérjük, próbálja újra!',
-                ]),
+                new File(),
                 new Image([
                     'minHeight' => $minHeight,
-                    'minHeightMessage' => sprintf('A képnek legalább %d pixel magasságúnak kell lennie.', $minHeight),
                     'minWidth' => $minWidth,
-                    'minWidthMessage' => sprintf('A képnek legalább %d pixel szélességűnek kell lennie.', $minWidth),
-                    'mimeTypesMessage' => 'A megadott fájl nem kép.',
-                    'sizeNotDetectedMessage' => 'A megadott fájl nem kép.',
                 ]),
             ]
         );
 
         if ($violations->count() > 0) {
-            return $this->errorResponse($violations->get(0)->getMessage());
+            return $this->errorResponse(
+                $violations->get(0)->getMessage(),
+                $violations->get(0)->getParameters(),
+                $locale
+            );
         }
 
         try {
             $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
         } catch (CouldNotUploadFile $e) {
-            return $this->errorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
+            return $this->errorResponse('The file could not be uploaded.', [], $locale);
         }
 
         return new JsonResponse(
@@ -160,32 +157,23 @@ final class MediaController
          * @var UploadedFile $image
          */
         $image = $request->files->get('upload');
+        $locale = $request->request->get('locale', 'hu');
 
         $validator = Validation::createValidator();
-        $violations = $validator->validate(
-            $image,
-            [
-                new File([
-                    'uploadIniSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
-                    'uploadFormSizeErrorMessage' => 'A képet nem sikerült feltölteni, mert túl nagy a mérete.',
-                    'uploadNoFileErrorMessage' => 'Nem adott meg képet.',
-                    'uploadErrorMessage' => 'A képet nem sikerült feltölteni. Kérjük, próbálja újra!',
-                ]),
-                new Image([
-                    'mimeTypesMessage' => 'A megadott fájl nem kép.',
-                    'sizeNotDetectedMessage' => 'A megadott fájl nem kép.',
-                ]),
-            ]
-        );
+        $violations = $validator->validate($image, [new File(), new Image()]);
 
         if ($violations->count() > 0) {
-            return $this->errorResponse($violations->get(0)->getMessage());
+            return $this->editorErrorResponse(
+                $violations->get(0)->getMessage(),
+                $violations->get(0)->getParameters(),
+                $locale
+            );
         }
 
         try {
             $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
         } catch (CouldNotUploadFile $e) {
-            return $this->editorErrorResponse('A képet nem sikerült feltölteni. Kérjük, próbálja újra!');
+            return $this->editorErrorResponse('The file could not be uploaded.', [], $locale);
         }
 
         return new JsonResponse(
@@ -195,17 +183,17 @@ final class MediaController
         );
     }
 
-    private function errorResponse(string $message): Response
+    private function errorResponse(string $message, array $params, string $locale): Response
     {
-        return new Response($message, 422);
+        return new Response($this->errorMessageTranslator->translate($message, $params, $locale), 422);
     }
 
-    private function editorErrorResponse(string $message): Response
+    private function editorErrorResponse(string $message, array $params, string $locale): Response
     {
         return new JsonResponse(
             [
                 'error' => [
-                    'message' => $message,
+                    'message' => $this->errorMessageTranslator->translate($message, $params, $locale),
                 ]
             ]
         );

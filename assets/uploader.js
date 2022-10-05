@@ -45,6 +45,7 @@ function uploadImage(_uploader, file) {
     formData.append('image', file, file.name);
     formData.append('min_height', _uploader.getAttribute('data-min-height'));
     formData.append('min_width', _uploader.getAttribute('data-min-width'));
+    formData.append('locale', lnorbyMediaLocale ?? 'hu');
 
     axios
         .post(lnorbyMediaImageUploadPath, formData)
@@ -89,6 +90,7 @@ function uploadFile(_uploader, file) {
 
     const formData = new FormData();
     formData.append('file', file, file.name);
+    formData.append('locale', lnorbyMediaLocale ?? 'hu');
 
     axios
         .post(lnorbyMediaFileUploadPath, formData)

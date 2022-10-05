@@ -21,6 +21,7 @@
     "doctrine/orm": "^2.10",
     "twig/twig": "^3.3",
     "symfony/string": "^5.4",
-    "symfony/form": "^5.4"
+    "symfony/form": "^5.4",
+    "symfony/translation": "^5.4"
   }
 }

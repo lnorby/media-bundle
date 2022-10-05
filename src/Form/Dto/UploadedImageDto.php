@@ -8,17 +8,10 @@ final class UploadedImageDto
 {
     public $entity;
 
+    /**
+     * @var Media
+     */
     public $media;
 
     public $position;
-
-    public static function create($entity, Media $media, ?int $position = null): self
-    {
-        $instance = new self();
-        $instance->entity = $entity;
-        $instance->media = $media;
-        $instance->position = $position;
-
-        return $instance;
-    }
 }
