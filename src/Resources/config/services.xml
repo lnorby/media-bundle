@@ -10,6 +10,7 @@
             <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
             <argument type="service" id="Lnorby\MediaBundle\ErrorMessageTranslator"/>
+            <argument type="service" id="validator"/>
         </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
             <argument/>

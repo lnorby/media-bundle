@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Image;
-use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class MediaController
 {
@@ -39,12 +39,18 @@ final class MediaController
      */
     private $errorMessageTranslator;
 
-    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository, ErrorMessageTranslator $errorMessageTranslator)
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository, ErrorMessageTranslator $errorMessageTranslator, ValidatorInterface $validator)
     {
         $this->uploadManager = $uploadManager;
         $this->downloadManager = $downloadManager;
         $this->mediaRepository = $mediaRepository;
         $this->errorMessageTranslator = $errorMessageTranslator;
+        $this->validator = $validator;
     }
 
     public function download(Request $request): Response
@@ -72,8 +78,7 @@ final class MediaController
         $file = $request->files->get('file');
         $locale = $request->request->get('locale', 'hu');
 
-        $validator = Validation::createValidator();
-        $violations = $validator->validate($file, [new File()]);
+        $violations = $this->validator->validate($file, [new File()]);
 
         if ($violations->count() > 0) {
             return $this->errorResponse(
@@ -112,8 +117,7 @@ final class MediaController
         $minHeight = $request->request->getInt('min_height');
         $locale = $request->request->get('locale', 'hu');
 
-        $validator = Validation::createValidator();
-        $violations = $validator->validate(
+        $violations = $this->validator->validate(
             $image,
             [
                 new File(),
@@ -159,8 +163,7 @@ final class MediaController
         $image = $request->files->get('upload');
         $locale = $request->request->get('locale', 'hu');
 
-        $validator = Validation::createValidator();
-        $violations = $validator->validate($image, [new File(), new Image()]);
+        $violations = $this->validator->validate($image, [new File(), new Image()]);
 
         if ($violations->count() > 0) {
             return $this->editorErrorResponse(

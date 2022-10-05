@@ -21,7 +21,7 @@ final class ErrorMessageTranslator
     public function translator(): TranslatorInterface
     {
         if (null === $this->translatorCache) {
-            $this->translatorCache = new Translator('en');
+            $this->translatorCache = new Translator('hu');
             $this->translatorCache->addLoader('array', new ArrayLoader());
             $this->translatorCache->addResource(
                 'array',
