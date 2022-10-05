@@ -3,7 +3,6 @@
 namespace Lnorby\MediaBundle\Controller;
 
 use Lnorby\MediaBundle\DownloadManager;
-use Lnorby\MediaBundle\ErrorMessageTranslator;
 use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
 use Lnorby\MediaBundle\Repository\MediaRepository;
@@ -16,6 +15,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class MediaController
 {
@@ -35,21 +35,21 @@ final class MediaController
     private $mediaRepository;
 
     /**
-     * @var ErrorMessageTranslator
+     * @var TranslatorInterface
      */
-    private $errorMessageTranslator;
+    private $translator;
 
     /**
      * @var ValidatorInterface
      */
     private $validator;
 
-    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository, ErrorMessageTranslator $errorMessageTranslator, ValidatorInterface $validator)
+    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository, TranslatorInterface $translator, ValidatorInterface $validator)
     {
         $this->uploadManager = $uploadManager;
         $this->downloadManager = $downloadManager;
         $this->mediaRepository = $mediaRepository;
-        $this->errorMessageTranslator = $errorMessageTranslator;
+        $this->translator = $translator;
         $this->validator = $validator;
     }
 
@@ -188,7 +188,7 @@ final class MediaController
 
     private function errorResponse(string $message, array $params, string $locale): Response
     {
-        return new Response($this->errorMessageTranslator->translate($message, $params, $locale), 422);
+        return new Response($this->translator->trans($message, $params, null, $locale), 422);
     }
 
     private function editorErrorResponse(string $message, array $params, string $locale): Response
@@ -196,7 +196,7 @@ final class MediaController
         return new JsonResponse(
             [
                 'error' => [
-                    'message' => $this->errorMessageTranslator->translate($message, $params, $locale),
+                    'message' => $this->translator->trans($message, $params, null, $locale),
                 ]
             ]
         );

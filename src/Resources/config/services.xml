@@ -9,7 +9,7 @@
             <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
             <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
             <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
-            <argument type="service" id="Lnorby\MediaBundle\ErrorMessageTranslator"/>
+            <argument type="service" id="translator.default"/>
             <argument type="service" id="validator"/>
         </service>
         <service id="Lnorby\MediaBundle\Storage\LocalStorage">
@@ -23,9 +23,6 @@
         <service id="Lnorby\MediaBundle\DownloadManager">
             <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
             <argument type="service" id="router.default"/>
-        </service>
-        <service id="Lnorby\MediaBundle\ErrorMessageTranslator">
-            <argument type="service" id="translator.default"/>
         </service>
         <service id="Lnorby\MediaBundle\UploadManager">
             <argument/>
