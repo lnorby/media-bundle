@@ -104,6 +104,7 @@ final class MediaController
 
     public function uploadImage(Request $request): Response
     {
+        dd($request->getLocale());
         /**
          * @var UploadedFile $image
          */
