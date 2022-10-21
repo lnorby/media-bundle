@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Sortable from 'sortablejs';
+import heic2any from 'heic2any';
 
 const _form = document.querySelector('.js-form');
 
@@ -42,6 +43,12 @@ function uploadImage(_uploader, file) {
     increaseDataAttribute(_form, 'uploads');
 
     const formData = new FormData();
+
+    if ('image/heic' === file.type) {
+        file = convertHeicToJpg(file);
+        console.log(file);
+    }
+
     formData.append('image', file, file.name);
     formData.append('min_height', _uploader.getAttribute('data-min-height'));
     formData.append('min_width', _uploader.getAttribute('data-min-width'));
@@ -59,6 +66,23 @@ function uploadImage(_uploader, file) {
         })
         .then(() => {
             decreaseDataAttribute(_form, 'uploads');
+        });
+}
+
+async function convertHeicToJpg(file) {
+    return await heic2any({blob: file, toType: 'image/jpg'})
+        .then(function (result) {
+            return new File(
+                [result],
+                file.name.replace(/\.([a-z0-9])$/i, '.jpg'),
+                {
+                    type: 'image/jpeg',
+                    lastModified: new Date().getTime(),
+                }
+            );
+        })
+        .catch(() => {
+            return file;
         });
 }
 
