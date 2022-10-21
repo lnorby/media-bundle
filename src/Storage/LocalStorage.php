@@ -7,11 +7,11 @@ final class LocalStorage implements Storage
     /**
      * @var string
      */
-    private $path;
+    private $basePath;
 
-    public function __construct(string $path)
+    public function __construct(string $basePath)
     {
-        $this->path = $path;
+        $this->basePath = $basePath;
     }
 
     public function createFile(string $file, $content): void
@@ -47,14 +47,14 @@ final class LocalStorage implements Storage
 
     public function getRealPath(string $file): string
     {
-        return $this->path . '/' . $file;
+        return $this->basePath . '/' . $file;
     }
 
     public function search(string $pattern): array
     {
         return array_map(
             function ($path) {
-                return str_replace($this->path . '/', '', $path);
+                return str_replace($this->basePath . '/', '', $path);
             },
             glob($this->getRealPath($pattern))
         );
