@@ -42,12 +42,12 @@ function prepareImageUpload(_uploader, file) {
     decreaseDataAttribute(_uploader, 'limit');
     increaseDataAttribute(_form, 'uploads');
 
-    if (file.name.match(/\.heic$/i)) {
+    if (file.name.match(/\.hei[cf]$/i)) {
         heic2any({blob: file, toType: 'image/jpg'})
             .then(function (result) {
                 file = new File(
                     [result],
-                    file.name.replace(/\.heic$/i, '.jpg'),
+                    file.name.replace(/\.hei[cf]$/i, '.jpg'),
                     {
                         type: 'image/jpeg',
                         lastModified: new Date().getTime(),
