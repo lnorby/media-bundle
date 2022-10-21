@@ -43,7 +43,7 @@ function uploadImage(_uploader, file) {
     increaseDataAttribute(_form, 'uploads');
 
     const formData = new FormData();
-
+    console.log(file.type);
     if ('image/heic' === file.type) {
         file = convertHeicToJpg(file);
         console.log(file);
