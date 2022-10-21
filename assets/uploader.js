@@ -24,6 +24,29 @@ function decreaseDataAttribute(_element, attribute) {
     }
 }
 
+function prepareImageUpload(_uploader, file) {
+    if (file.name.match(/\.heic$/i)) {
+        heic2any({blob: file, toType: 'image/jpg'})
+            .then(function (result) {
+                file = new File(
+                    [result],
+                    file.name.replace(/\.heic$/i, '.jpg'),
+                    {
+                        type: 'image/jpeg',
+                        lastModified: new Date().getTime(),
+                    }
+                );
+            })
+            .catch(() => {
+            })
+            .finally(() => {
+                uploadImage(_uploader, file);
+            });
+    } else {
+        uploadImage(_uploader, file);
+    }
+}
+
 function uploadImage(_uploader, file) {
     let _image;
 
@@ -43,12 +66,6 @@ function uploadImage(_uploader, file) {
     increaseDataAttribute(_form, 'uploads');
 
     const formData = new FormData();
-
-    if (file.name.match(/\.heic$/i)) {
-        file = convertHeicToJpg(file);
-        console.log(file);
-    }
-
     formData.append('image', file, file.name);
     formData.append('min_height', _uploader.getAttribute('data-min-height'));
     formData.append('min_width', _uploader.getAttribute('data-min-width'));
@@ -66,23 +83,6 @@ function uploadImage(_uploader, file) {
         })
         .then(() => {
             decreaseDataAttribute(_form, 'uploads');
-        });
-}
-
-async function convertHeicToJpg(file) {
-    return await heic2any({blob: file, toType: 'image/jpg'})
-        .then(function (result) {
-            return new File(
-                [result],
-                file.name.replace(/\.([a-z0-9])$/i, '.jpg'),
-                {
-                    type: 'image/jpeg',
-                    lastModified: new Date().getTime(),
-                }
-            );
-        })
-        .catch(() => {
-            return file;
         });
 }
 
@@ -156,7 +156,7 @@ document.addEventListener('change', (event) => {
                 break;
             }
 
-            uploadImage(_uploader, _filePicker.files[i]);
+            prepareImageUpload(_uploader, _filePicker.files[i]);
         }
 
         _filePicker.value = '';
