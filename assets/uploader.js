@@ -25,29 +25,6 @@ function decreaseDataAttribute(_element, attribute) {
 }
 
 function prepareImageUpload(_uploader, file) {
-    if (file.name.match(/\.heic$/i)) {
-        heic2any({blob: file, toType: 'image/jpg'})
-            .then(function (result) {
-                file = new File(
-                    [result],
-                    file.name.replace(/\.heic$/i, '.jpg'),
-                    {
-                        type: 'image/jpeg',
-                        lastModified: new Date().getTime(),
-                    }
-                );
-            })
-            .catch(() => {
-            })
-            .finally(() => {
-                uploadImage(_uploader, file);
-            });
-    } else {
-        uploadImage(_uploader, file);
-    }
-}
-
-function uploadImage(_uploader, file) {
     let _image;
 
     if (_uploader.classList.contains('js-multiple-image-uploader')) {
@@ -65,6 +42,29 @@ function uploadImage(_uploader, file) {
     decreaseDataAttribute(_uploader, 'limit');
     increaseDataAttribute(_form, 'uploads');
 
+    if (file.name.match(/\.heic$/i)) {
+        heic2any({blob: file, toType: 'image/jpg'})
+            .then(function (result) {
+                file = new File(
+                    [result],
+                    file.name.replace(/\.heic$/i, '.jpg'),
+                    {
+                        type: 'image/jpeg',
+                        lastModified: new Date().getTime(),
+                    }
+                );
+            })
+            .catch(() => {
+            })
+            .finally(() => {
+                uploadImage(_uploader, file, _image);
+            });
+    } else {
+        uploadImage(_uploader, file, _image);
+    }
+}
+
+function uploadImage(_uploader, file, _image) {
     const formData = new FormData();
     formData.append('image', file, file.name);
     formData.append('min_height', _uploader.getAttribute('data-min-height'));
