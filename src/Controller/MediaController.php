@@ -3,10 +3,9 @@
 namespace Lnorby\MediaBundle\Controller;
 
 use Lnorby\MediaBundle\DownloadManager;
-use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
 use Lnorby\MediaBundle\Exception\CouldNotUploadFile;
-use Lnorby\MediaBundle\Repository\MediaRepository;
 use Lnorby\MediaBundle\UploadManager;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,11 +29,6 @@ final class MediaController
     private $downloadManager;
 
     /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
-    /**
      * @var TranslatorInterface
      */
     private $translator;
@@ -44,30 +38,25 @@ final class MediaController
      */
     private $validator;
 
-    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, MediaRepository $mediaRepository, TranslatorInterface $translator, ValidatorInterface $validator)
+    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, TranslatorInterface $translator, ValidatorInterface $validator)
     {
         $this->uploadManager = $uploadManager;
         $this->downloadManager = $downloadManager;
-        $this->mediaRepository = $mediaRepository;
         $this->translator = $translator;
         $this->validator = $validator;
     }
 
     public function download(Request $request): Response
     {
-        $path = $request->attributes->get('path');
+        $publicPath = $request->attributes->get('path');
 
-        if (preg_match('#^((?:[0-9a-f]{2}/){3}[0-9a-f]{10})\.(\d+)x(\d+)([rc])(\.[a-z0-9]+)$#', $path, $matches)) {
-            try {
-                $media = $this->mediaRepository->getByPath($matches[1] . $matches[5]);
-            } catch (CouldNotFindMedia $e) {
-                throw new NotFoundHttpException();
-            }
-
-            return $this->downloadManager->downloadModifiedImage($media, $matches[2], $matches[3], $matches[4]);
+        try {
+            $realPath = $this->downloadManager->getRealPathFromPublicPath($publicPath);
+        } catch (\RuntimeException $e) {
+            throw new NotFoundHttpException();
         }
 
-        throw new NotFoundHttpException();
+        return new BinaryFileResponse($realPath, 200, [], false);
     }
 
     public function uploadFile(Request $request): Response
@@ -76,7 +65,6 @@ final class MediaController
          * @var UploadedFile $file
          */
         $file = $request->files->get('file');
-
         $violations = $this->validator->validate($file, [new File()]);
 
         if ($violations->count() > 0) {
@@ -84,7 +72,7 @@ final class MediaController
         }
 
         try {
-            $media = $this->uploadManager->uploadFile(
+            $media = $this->uploadManager->uploadFileAndCreateMedia(
                 $file->getClientOriginalName(),
                 $file->getContent(),
                 $file->getMimeType()
@@ -97,7 +85,7 @@ final class MediaController
             [
                 'id' => $media->id(),
                 'name' => $media->name(),
-                'url' => $this->downloadManager->generateDownloadUrlForFile($media),
+                'url' => $this->downloadManager->downloadUrlForMediaFile($media),
             ]
         );
     }
@@ -127,7 +115,10 @@ final class MediaController
         }
 
         try {
-            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
+            $media = $this->uploadManager->uploadImageAndCreateMedia(
+                $image->getClientOriginalName(),
+                $image->getContent()
+            );
         } catch (CouldNotUploadFile $e) {
             return $this->errorResponse('The file could not be uploaded.');
         }
@@ -135,7 +126,7 @@ final class MediaController
         return new JsonResponse(
             [
                 'id' => $media->id(),
-                'url' => $this->downloadManager->generateDownloadUrlForModifiedImage(
+                'url' => $this->downloadManager->downloadUrlForMediaModifiedImage(
                     $media,
                     250,
                     250,
@@ -151,22 +142,27 @@ final class MediaController
          * @var UploadedFile $image
          */
         $image = $request->files->get('upload');
-
         $violations = $this->validator->validate($image, [new File(), new Image()]);
 
         if ($violations->count() > 0) {
-            return $this->editorErrorResponse($violations->get(0)->getMessage(), $violations->get(0)->getParameters());
+            return $this->editorErrorResponse(
+                $violations->get(0)->getMessage(),
+                $violations->get(0)->getParameters()
+            );
         }
 
         try {
-            $media = $this->uploadManager->uploadImage($image->getClientOriginalName(), $image->getContent());
+            $media = $this->uploadManager->uploadImageAndCreateMedia(
+                $image->getClientOriginalName(),
+                $image->getContent()
+            );
         } catch (CouldNotUploadFile $e) {
             return $this->editorErrorResponse('The file could not be uploaded.');
         }
 
         return new JsonResponse(
             [
-                'url' => $this->downloadManager->generateDownloadUrlForFile($media),
+                'url' => $this->downloadManager->downloadUrlForMediaFile($media),
             ]
         );
     }

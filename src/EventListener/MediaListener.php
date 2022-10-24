@@ -20,6 +20,6 @@ final class MediaListener
 
     public function preRemove(Media $media, LifecycleEventArgs $eventArgs): void
     {
-        $this->mediaManager->deleteFiles($media);
+        $this->mediaManager->deleteMediaFiles($media);
     }
 }

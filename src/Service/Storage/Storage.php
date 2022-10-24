@@ -1,6 +1,6 @@
 <?php
 
-namespace Lnorby\MediaBundle\Storage;
+namespace Lnorby\MediaBundle\Service\Storage;
 
 interface Storage
 {

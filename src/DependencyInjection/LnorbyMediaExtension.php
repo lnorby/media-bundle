@@ -17,7 +17,7 @@ final class LnorbyMediaExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $definition = $container->getDefinition('Lnorby\MediaBundle\Storage\LocalStorage');
+        $definition = $container->getDefinition('Lnorby\MediaBundle\Service\Storage\LocalStorage');
         $definition->replaceArgument(0, $config['storage']['local']['path']);
 
         $definition = $container->getDefinition('Lnorby\MediaBundle\UploadManager');

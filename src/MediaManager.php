@@ -4,7 +4,7 @@ namespace Lnorby\MediaBundle;
 
 use Lnorby\MediaBundle\Entity\Media;
 use Lnorby\MediaBundle\Repository\MediaRepository;
-use Lnorby\MediaBundle\Storage\Storage;
+use Lnorby\MediaBundle\Service\Storage\Storage;
 
 final class MediaManager
 {
@@ -37,7 +37,7 @@ final class MediaManager
         $this->mediaRepository->remove($media);
     }
 
-    public function deleteFiles(Media $media): void
+    public function deleteMediaFiles(Media $media): void
     {
         $pattern = sprintf(
             '%s/%s.*.%s',

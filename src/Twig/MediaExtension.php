@@ -46,7 +46,7 @@ final class MediaExtension extends AbstractExtension
             }
         }
 
-        return $this->downloadManager->generateDownloadUrlForFile($media);
+        return $this->downloadManager->downloadUrlForMediaFile($media);
     }
 
     public function resizedImage($media, int $width, int $height): string
@@ -59,7 +59,7 @@ final class MediaExtension extends AbstractExtension
             }
         }
 
-        return $this->downloadManager->generateDownloadUrlForModifiedImage(
+        return $this->downloadManager->downloadUrlForMediaModifiedImage(
             $media,
             $width,
             $height,
@@ -77,7 +77,7 @@ final class MediaExtension extends AbstractExtension
             }
         }
 
-        return $this->downloadManager->generateDownloadUrlForModifiedImage(
+        return $this->downloadManager->downloadUrlForMediaModifiedImage(
             $media,
             $width,
             $height,

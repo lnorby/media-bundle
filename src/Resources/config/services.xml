@@ -8,29 +8,36 @@
         <service id="Lnorby\MediaBundle\Controller\MediaController" public="true">
             <argument type="service" id="Lnorby\MediaBundle\UploadManager"/>
             <argument type="service" id="Lnorby\MediaBundle\DownloadManager"/>
-            <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
             <argument type="service" id="translator.default"/>
             <argument type="service" id="validator"/>
         </service>
-        <service id="Lnorby\MediaBundle\Storage\LocalStorage">
+        <service id="Lnorby\MediaBundle\Service\Storage\LocalStorage">
             <argument/>
         </service>
-        <service id="Lnorby\MediaBundle\Storage\Storage" alias="Lnorby\MediaBundle\Storage\LocalStorage"/>
+        <service id="Lnorby\MediaBundle\Service\FilenameGenerator">
+            <argument type="service" id="slugger"/>
+        </service>
+        <service id="Lnorby\MediaBundle\Service\ImageManipulator\ImageManipulatorUsingIntervention"/>
+        <service id="Lnorby\MediaBundle\Service\Storage\Storage" alias="Lnorby\MediaBundle\Service\Storage\LocalStorage"/>
+        <service id="Lnorby\MediaBundle\Service\ImageManipulator\ImageManipulator" alias="Lnorby\MediaBundle\Service\ImageManipulator\ImageManipulatorUsingIntervention"/>
         <service id="Lnorby\MediaBundle\MediaManager">
-            <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
+            <argument type="service" id="Lnorby\MediaBundle\Service\Storage\Storage"/>
             <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
         </service>
         <service id="Lnorby\MediaBundle\DownloadManager">
-            <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
+            <argument type="service" id="Lnorby\MediaBundle\Repository\MediaRepository"/>
+            <argument type="service" id="Lnorby\MediaBundle\Service\Storage\Storage"/>
             <argument type="service" id="router.default"/>
+            <argument type="service" id="Lnorby\MediaBundle\Service\ImageManipulator\ImageManipulator"/>
         </service>
         <service id="Lnorby\MediaBundle\UploadManager">
             <argument/>
             <argument/>
             <argument/>
             <argument type="service" id="Lnorby\MediaBundle\MediaManager"/>
-            <argument type="service" id="Lnorby\MediaBundle\Storage\Storage"/>
-            <argument type="service" id="slugger"/>
+            <argument type="service" id="Lnorby\MediaBundle\Service\Storage\Storage"/>
+            <argument type="service" id="Lnorby\MediaBundle\Service\FilenameGenerator"/>
+            <argument type="service" id="Lnorby\MediaBundle\Service\ImageManipulator\ImageManipulator"/>
         </service>
         <service id="Lnorby\MediaBundle\EventListener\MediaListener">
             <argument type="service" id="Lnorby\MediaBundle\MediaManager"/>

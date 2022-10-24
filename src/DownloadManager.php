@@ -3,14 +3,22 @@
 namespace Lnorby\MediaBundle;
 
 use Lnorby\MediaBundle\Entity\Media;
-use Lnorby\MediaBundle\Storage\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
+use Lnorby\MediaBundle\Repository\MediaRepository;
+use Lnorby\MediaBundle\Service\ImageManipulator\CouldNotManipulateImage;
+use Lnorby\MediaBundle\Service\ImageManipulator\ImageManipulator;
+use Lnorby\MediaBundle\Service\Storage\Storage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class DownloadManager
 {
     public const IMAGE_RESIZE = 'r';
     public const IMAGE_CROP = 'c';
+
+    /**
+     * @var MediaRepository
+     */
+    private $mediaRepository;
 
     /**
      * @var Storage
@@ -22,13 +30,20 @@ final class DownloadManager
      */
     private $urlGenerator;
 
-    public function __construct(Storage $storage, UrlGeneratorInterface $urlGenerator)
+    /**
+     * @var ImageManipulator
+     */
+    private $imageManipulator;
+
+    public function __construct(MediaRepository $mediaRepository, Storage $storage, UrlGeneratorInterface $urlGenerator, ImageManipulator $imageManipulator)
     {
+        $this->mediaRepository = $mediaRepository;
         $this->storage = $storage;
         $this->urlGenerator = $urlGenerator;
+        $this->imageManipulator = $imageManipulator;
     }
 
-    public function generateDownloadUrlForFile(Media $media): string
+    public function downloadUrlForMediaFile(Media $media): string
     {
         return $this->urlGenerator->generate(
             'lnorby_media_download',
@@ -39,65 +54,87 @@ final class DownloadManager
         );
     }
 
-    public function generateDownloadUrlForModifiedImage(Media $media, int $width, int $height, string $mode): string
+    public function downloadUrlForMediaModifiedImage(Media $media, int $width, int $height, string $mode): string
     {
         return $this->urlGenerator->generate(
             'lnorby_media_download',
             [
-                'path' => $this->getModifiedImagePath($media, $width, $height, $mode),
+                'path' => $this->modifiedImagePath($media->path(), $width, $height, $mode),
             ],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
     }
 
-    public function downloadFile(Media $media): BinaryFileResponse
+    public function getRealPathFromPublicPath(string $publicPath): string
     {
-        if (!$this->storage->fileExists($media->path())) {
-            throw new \RuntimeException('File does not exist.');
+        if ($this->storage->fileExists($publicPath)) {
+            return $this->storage->getRealPath($publicPath);
         }
 
-        return $this->createFileResponse($media->path());
+        $isPathToAModifiedImage = preg_match(
+            '#^((?:[0-9a-f]{2}/){3}[0-9a-f]{10})\.(\d+)x(\d+)([rc])(\.[a-z0-9]+)$#',
+            $publicPath,
+            $matches
+        );
+
+        if (!$isPathToAModifiedImage) {
+            throw new \RuntimeException('Could not find file.');
+        }
+
+        list(, $filename, $width, $height, $mode, $fileExtension) = $matches;
+
+        try {
+            $media = $this->mediaRepository->getByPath($filename . $fileExtension);
+        } catch (CouldNotFindMedia $e) {
+            throw new \RuntimeException('Could not find media.');
+        }
+
+        $this->modifyImage($media, $publicPath, $width, $height, $mode);
+
+        return $this->storage->getRealPath($publicPath);
     }
 
-    public function downloadModifiedImage(Media $media, int $width, int $height, string $mode): BinaryFileResponse
+    private function modifyImage(Media $media, string $destination, int $width, int $height, string $mode): void
     {
-        $path = $this->getModifiedImagePath($media, $width, $height, $mode);
+        if (!$media->isImage()) {
+            throw new \InvalidArgumentException(sprintf('Media "%d" is not an image.', $media->id()));
+        }
 
-        if (!$this->storage->fileExists($path)) {
-            if (!$media->isImage()) {
-                throw new \RuntimeException('Media is not an image.');
-            }
-
-            $imageManipulator = new ImageManipulator($this->storage->getRealPath($media->path()));
-
+        try {
             if (self::IMAGE_RESIZE === $mode) {
-                $imageManipulator->resize($width, $height);
+                $modifiedImage = $this->imageManipulator->resize(
+                    $this->storage->getRealPath($media->path()),
+                    $width,
+                    $height
+                );
             } else {
-                $imageManipulator->crop($width, $height);
+                $modifiedImage = $this->imageManipulator->crop(
+                    $this->storage->getRealPath($media->path()),
+                    $width,
+                    $height
+                );
             }
-
-            $modifiedImage = $imageManipulator->execute();
-            $this->storage->createFile($path, $modifiedImage);
+        } catch (CouldNotManipulateImage $e) {
+            throw new \RuntimeException('Could not modify image.');
         }
 
-        return $this->createFileResponse($path);
+        try {
+            $this->storage->createFile($destination, $modifiedImage);
+        } catch (\RuntimeException $e) {
+            throw new \RuntimeException('Could not write image data to file.');
+        }
     }
 
-    private function getModifiedImagePath(Media $media, int $width, int $height, string $mode): string
+    private function modifiedImagePath(string $originalPath, int $width, int $height, string $mode): string
     {
         return sprintf(
             '%s/%s.%dx%d%s.%s',
-            pathinfo($media->path(), PATHINFO_DIRNAME),
-            pathinfo($media->path(), PATHINFO_FILENAME),
+            pathinfo($originalPath, PATHINFO_DIRNAME),
+            pathinfo($originalPath, PATHINFO_FILENAME),
             $width,
             $height,
             $mode,
-            pathinfo($media->path(), PATHINFO_EXTENSION)
+            pathinfo($originalPath, PATHINFO_EXTENSION)
         );
-    }
-
-    private function createFileResponse(string $path): BinaryFileResponse
-    {
-        return new BinaryFileResponse($this->storage->getRealPath($path), 200, [], false);
     }
 }
