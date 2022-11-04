@@ -43,14 +43,14 @@ final class DownloadManager
         $this->imageManipulator = $imageManipulator;
     }
 
-    public function downloadUrlForMediaFile(Media $media): string
+    public function downloadUrlForMediaFile(Media $media, bool $withDomain = true): string
     {
         return $this->urlGenerator->generate(
             'lnorby_media_download',
             [
                 'path' => $media->path(),
             ],
-            UrlGeneratorInterface::ABSOLUTE_URL
+            $withDomain ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH
         );
     }
 

@@ -162,7 +162,7 @@ final class MediaController
 
         return new JsonResponse(
             [
-                'url' => $this->downloadManager->downloadUrlForMediaFile($media),
+                'url' => $this->downloadManager->downloadUrlForMediaFile($media, false),
             ]
         );
     }
