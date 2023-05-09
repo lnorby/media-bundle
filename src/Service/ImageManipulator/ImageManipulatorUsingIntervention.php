@@ -42,7 +42,7 @@ final class ImageManipulatorUsingIntervention implements ImageManipulator
 
         try {
             $image->orientate();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return $image;

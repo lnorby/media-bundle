@@ -13,14 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class FileUploaderType extends AbstractType
 {
-    /**
-     * @var MediaTransformer
-     */
-    private $transformer;
-
-    public function __construct(MediaTransformer $transformer)
+    public function __construct(private readonly MediaTransformer $transformer)
     {
-        $this->transformer = $transformer;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -50,7 +44,7 @@ final class FileUploaderType extends AbstractType
         $resolver->setAllowedTypes('deletable', 'bool');
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return TextType::class;
     }

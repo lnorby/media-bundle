@@ -9,14 +9,8 @@ use Lnorby\MediaBundle\Exception\CouldNotFindMedia;
 
 final class MediaRepository
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
     }
 
     public function add(Media $media): void
@@ -47,7 +41,7 @@ final class MediaRepository
                 ->createQuery($dql)
                 ->setParameter('id', $id)
                 ->getSingleResult();
-        } catch (NoResultException $e) {
+        } catch (NoResultException) {
             throw CouldNotFindMedia::withId($id);
         }
     }
@@ -68,7 +62,7 @@ final class MediaRepository
                 ->createQuery($dql)
                 ->setParameter('path', $path)
                 ->getSingleResult();
-        } catch (NoResultException $e) {
+        } catch (NoResultException) {
             throw CouldNotFindMedia::withPath($path);
         }
     }

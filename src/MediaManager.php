@@ -8,20 +8,8 @@ use Lnorby\MediaBundle\Service\Storage\Storage;
 
 final class MediaManager
 {
-    /**
-     * @var Storage
-     */
-    private $storage;
-
-    /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
-    public function __construct(Storage $storage, MediaRepository $mediaRepository)
+    public function __construct(private readonly Storage $storage, private readonly MediaRepository $mediaRepository)
     {
-        $this->storage = $storage;
-        $this->mediaRepository = $mediaRepository;
     }
 
     public function createMedia(string $path, string $originalName, string $mimeType): Media

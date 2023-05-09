@@ -10,34 +10,28 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 final class MediaTransformer implements DataTransformerInterface
 {
-    /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
-    public function __construct(MediaRepository $mediaRepository)
+    public function __construct(private readonly MediaRepository $mediaRepository)
     {
-        $this->mediaRepository = $mediaRepository;
     }
 
-    public function transform($media)
+    public function transform($value)
     {
-        if (!$media instanceof Media) {
+        if (!$value instanceof Media) {
             return '';
         }
 
-        return $media->id();
+        return $value->id();
     }
 
-    public function reverseTransform($mediaId)
+    public function reverseTransform($value)
     {
-        if (!$mediaId) {
+        if (!$value) {
             return null;
         }
 
         try {
-            $media = $this->mediaRepository->getById((int)$mediaId);
-        } catch (CouldNotFindMedia $e) {
+            $media = $this->mediaRepository->getById((int)$value);
+        } catch (CouldNotFindMedia) {
             throw new TransformationFailedException('Media does not exist.');
         }
 

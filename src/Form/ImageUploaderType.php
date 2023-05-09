@@ -12,14 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ImageUploaderType extends AbstractType
 {
-    /**
-     * @var MediaTransformer
-     */
-    private $transformer;
-
-    public function __construct(MediaTransformer $transformer)
+    public function __construct(private readonly MediaTransformer $transformer)
     {
-        $this->transformer = $transformer;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -48,7 +42,7 @@ final class ImageUploaderType extends AbstractType
         $resolver->setAllowedTypes('min_width', ['int']);
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return TextType::class;
     }

@@ -11,14 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class UploadedImageType extends AbstractType
 {
-    /**
-     * @var MediaTransformer
-     */
-    private $transformer;
-
-    public function __construct(MediaTransformer $transformer)
+    public function __construct(private readonly MediaTransformer $transformer)
     {
-        $this->transformer = $transformer;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)

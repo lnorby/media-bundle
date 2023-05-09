@@ -4,14 +4,8 @@ namespace Lnorby\MediaBundle\Service\Storage;
 
 final class LocalStorage implements Storage
 {
-    /**
-     * @var string
-     */
-    private $basePath;
-
-    public function __construct(string $basePath)
+    public function __construct(private readonly string $basePath)
     {
-        $this->basePath = $basePath;
     }
 
     public function createFile(string $file, $content): void

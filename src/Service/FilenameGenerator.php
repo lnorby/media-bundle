@@ -6,14 +6,8 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 final class FilenameGenerator
 {
-    /**
-     * @var SluggerInterface
-     */
-    private $slugger;
-
-    public function __construct(SluggerInterface $slugger)
+    public function __construct(private readonly SluggerInterface $slugger)
     {
-        $this->slugger = $slugger;
     }
 
     public function generateUniqueFilenameWithPath(string $extension): string

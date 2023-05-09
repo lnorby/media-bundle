@@ -4,25 +4,10 @@ namespace Lnorby\MediaBundle\Entity;
 
 class Media
 {
-    /**
-     * @var int
-     */
-    private $id;
-
-    /**
-     * @var string
-     */
-    private $path;
-
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var string
-     */
-    private $mimeType;
+    private int $id;
+    private string $path;
+    private string $name;
+    private string $mimeType;
 
     public function __construct(string $path, string $name, string $mimeType)
     {
@@ -53,6 +38,6 @@ class Media
 
     public function isImage(): bool
     {
-        return strpos($this->mimeType, 'image/') === 0;
+        return str_starts_with($this->mimeType, 'image/');
     }
 }

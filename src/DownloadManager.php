@@ -15,32 +15,12 @@ final class DownloadManager
     public const IMAGE_RESIZE = 'r';
     public const IMAGE_CROP = 'c';
 
-    /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
-    /**
-     * @var Storage
-     */
-    private $storage;
-
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $urlGenerator;
-
-    /**
-     * @var ImageManipulator
-     */
-    private $imageManipulator;
-
-    public function __construct(MediaRepository $mediaRepository, Storage $storage, UrlGeneratorInterface $urlGenerator, ImageManipulator $imageManipulator)
-    {
-        $this->mediaRepository = $mediaRepository;
-        $this->storage = $storage;
-        $this->urlGenerator = $urlGenerator;
-        $this->imageManipulator = $imageManipulator;
+    public function __construct(
+        private readonly MediaRepository $mediaRepository,
+        private readonly Storage $storage,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ImageManipulator $imageManipulator
+    ) {
     }
 
     public function downloadUrlForMediaFile(Media $media, bool $withDomain = true): string
@@ -85,7 +65,7 @@ final class DownloadManager
 
         try {
             $media = $this->mediaRepository->getByPath($filename . $fileExtension);
-        } catch (CouldNotFindMedia $e) {
+        } catch (CouldNotFindMedia) {
             throw new \RuntimeException('Could not find media.');
         }
 
@@ -114,13 +94,13 @@ final class DownloadManager
                     $height
                 );
             }
-        } catch (CouldNotManipulateImage $e) {
+        } catch (CouldNotManipulateImage) {
             throw new \RuntimeException('Could not modify image.');
         }
 
         try {
             $this->storage->createFile($destination, $modifiedImage);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             throw new \RuntimeException('Could not write image data to file.');
         }
     }

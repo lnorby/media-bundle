@@ -18,32 +18,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class MediaController
 {
-    /**
-     * @var UploadManager
-     */
-    private $uploadManager;
-
-    /**
-     * @var DownloadManager
-     */
-    private $downloadManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    public function __construct(UploadManager $uploadManager, DownloadManager $downloadManager, TranslatorInterface $translator, ValidatorInterface $validator)
-    {
-        $this->uploadManager = $uploadManager;
-        $this->downloadManager = $downloadManager;
-        $this->translator = $translator;
-        $this->validator = $validator;
+    public function __construct(
+        private readonly UploadManager $uploadManager,
+        private readonly DownloadManager $downloadManager,
+        private readonly TranslatorInterface $translator,
+        private readonly ValidatorInterface $validator
+    ) {
     }
 
     public function download(Request $request): Response
@@ -52,7 +32,7 @@ final class MediaController
 
         try {
             $realPath = $this->downloadManager->getRealPathFromPublicPath($publicPath);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException) {
             throw new NotFoundHttpException();
         }
 
@@ -77,7 +57,7 @@ final class MediaController
                 $file->getContent(),
                 $file->getMimeType()
             );
-        } catch (CouldNotUploadFile $e) {
+        } catch (CouldNotUploadFile) {
             return $this->errorResponse('The file could not be uploaded.');
         }
 
@@ -119,7 +99,7 @@ final class MediaController
                 $image->getClientOriginalName(),
                 $image->getContent()
             );
-        } catch (CouldNotUploadFile $e) {
+        } catch (CouldNotUploadFile) {
             return $this->errorResponse('The file could not be uploaded.');
         }
 
@@ -156,7 +136,7 @@ final class MediaController
                 $image->getClientOriginalName(),
                 $image->getContent()
             );
-        } catch (CouldNotUploadFile $e) {
+        } catch (CouldNotUploadFile) {
             return $this->editorErrorResponse('The file could not be uploaded.');
         }
 

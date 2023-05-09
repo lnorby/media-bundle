@@ -11,20 +11,8 @@ use Twig\TwigFunction;
 
 final class MediaExtension extends AbstractExtension
 {
-    /**
-     * @var DownloadManager
-     */
-    private $downloadManager;
-
-    /**
-     * @var MediaRepository
-     */
-    private $mediaRepository;
-
-    public function __construct(DownloadManager $downloadManager, MediaRepository $mediaRepository)
+    public function __construct(private readonly DownloadManager $downloadManager, private readonly MediaRepository $mediaRepository)
     {
-        $this->downloadManager = $downloadManager;
-        $this->mediaRepository = $mediaRepository;
     }
 
     public function getFunctions(): array
@@ -41,7 +29,7 @@ final class MediaExtension extends AbstractExtension
         if (!$media instanceof Media) {
             try {
                 $media = $this->mediaRepository->getById((int)$media);
-            } catch (CouldNotFindMedia $e) {
+            } catch (CouldNotFindMedia) {
                 return '';
             }
         }
@@ -54,7 +42,7 @@ final class MediaExtension extends AbstractExtension
         if (!$media instanceof Media) {
             try {
                 $media = $this->mediaRepository->getById((int)$media);
-            } catch (CouldNotFindMedia $e) {
+            } catch (CouldNotFindMedia) {
                 return '';
             }
         }
@@ -72,7 +60,7 @@ final class MediaExtension extends AbstractExtension
         if (!$media instanceof Media) {
             try {
                 $media = $this->mediaRepository->getById((int)$media);
-            } catch (CouldNotFindMedia $e) {
+            } catch (CouldNotFindMedia) {
                 return '';
             }
         }

@@ -10,50 +10,15 @@ use Lnorby\MediaBundle\Service\Storage\Storage;
 
 final class UploadManager
 {
-    /**
-     * @var int
-     */
-    private $imageWidth;
-
-    /**
-     * @var int
-     */
-    private $imageHeight;
-
-    /**
-     * @var int
-     */
-    private $quality;
-
-    /**
-     * @var MediaManager
-     */
-    private $mediaManager;
-
-    /**
-     * @var Storage
-     */
-    private $storage;
-
-    /**
-     * @var FilenameGenerator
-     */
-    private $filenameGenerator;
-
-    /**
-     * @var ImageManipulator
-     */
-    private $imageManipulator;
-
-    public function __construct(int $imageWidth, int $imageHeight, int $quality, MediaManager $mediaManager, Storage $storage, FilenameGenerator $filenameGenerator, ImageManipulator $imageManipulator)
-    {
-        $this->imageWidth = $imageWidth;
-        $this->imageHeight = $imageHeight;
-        $this->quality = $quality;
-        $this->mediaManager = $mediaManager;
-        $this->storage = $storage;
-        $this->filenameGenerator = $filenameGenerator;
-        $this->imageManipulator = $imageManipulator;
+    public function __construct(
+        private readonly int $imageWidth,
+        private readonly int $imageHeight,
+        private readonly int $quality,
+        private readonly MediaManager $mediaManager,
+        private readonly Storage $storage,
+        private readonly FilenameGenerator $filenameGenerator,
+        private readonly ImageManipulator $imageManipulator
+    ) {
     }
 
     /**

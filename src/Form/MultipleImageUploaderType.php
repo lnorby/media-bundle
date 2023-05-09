@@ -54,7 +54,7 @@ final class MultipleImageUploaderType extends AbstractType implements DataTransf
         $resolver->setAllowedTypes('transform', ['bool']);
     }
 
-    public function getParent()
+    public function getParent(): string
     {
         return CollectionType::class;
     }
@@ -71,7 +71,7 @@ final class MultipleImageUploaderType extends AbstractType implements DataTransf
         )->toArray();
     }
 
-    public function reverseTransform($value)
+    public function reverseTransform($value): ArrayCollection
     {
         return new ArrayCollection(
             array_map(

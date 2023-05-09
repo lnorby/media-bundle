@@ -8,14 +8,8 @@ use Lnorby\MediaBundle\MediaManager;
 
 final class MediaListener
 {
-    /**
-     * @var MediaManager
-     */
-    private $mediaManager;
-
-    public function __construct(MediaManager $mediaManager)
+    public function __construct(private readonly MediaManager $mediaManager)
     {
-        $this->mediaManager = $mediaManager;
     }
 
     public function preRemove(Media $media, LifecycleEventArgs $eventArgs): void
