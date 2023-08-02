@@ -2,8 +2,6 @@ import axios from 'axios';
 import Sortable from 'sortablejs';
 import heic2any from 'heic2any';
 
-const _form = document.querySelector('.js-form');
-
 function increaseDataAttribute(_element, attribute) {
     attribute = `data-${attribute}`;
 
@@ -40,7 +38,7 @@ function prepareImageUpload(_uploader, file) {
 
     _image.classList.add('is-uploading');
     decreaseDataAttribute(_uploader, 'limit');
-    increaseDataAttribute(_form, 'uploads');
+    increaseDataAttribute(_uploader.closest('.js-form'), 'uploads');
 
     if (file.name.match(/\.hei[cf]$/i)) {
         heic2any({blob: file, toType: 'image/jpg'})
@@ -82,7 +80,7 @@ function uploadImage(_uploader, file, _image) {
             alert(error.response.data);
         })
         .then(() => {
-            decreaseDataAttribute(_form, 'uploads');
+            decreaseDataAttribute(_uploader.closest('.js-form'), 'uploads');
         });
 }
 
@@ -108,6 +106,7 @@ function updateImagePositions(_uploader) {
 
 function uploadFile(_uploader, file) {
     _uploader.classList.add('is-uploading');
+    const _form = _uploader.closest('.js-form');
 
     increaseDataAttribute(_form, 'uploads');
 
@@ -187,10 +186,14 @@ document.querySelectorAll('.js-multiple-image-uploader[data-sortable]').forEach(
     });
 });
 
-if (_form) {
-    _form.addEventListener('submit', (event) => {
-        if (_form.hasAttribute('data-uploads') && parseInt(_form.getAttribute('data-uploads')) > 0) {
-            event.preventDefault();
-        }
-    });
-}
+document.addEventListener('submit', (event) => {
+    const _target = event.target;
+
+    if (!_target.classList.contains('js-form')) {
+        return;
+    }
+
+    if (_target.hasAttribute('data-uploads') && parseInt(_target.getAttribute('data-uploads')) > 0) {
+        event.preventDefault();
+    }
+});
