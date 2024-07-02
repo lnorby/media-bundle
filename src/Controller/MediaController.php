@@ -108,9 +108,9 @@ final class MediaController
                 'id' => $media->id(),
                 'url' => $this->downloadManager->downloadUrlForMediaModifiedImage(
                     $media,
-                    250,
-                    250,
-                    DownloadManager::IMAGE_CROP
+                    800,
+                    800,
+                    DownloadManager::IMAGE_RESIZE
                 ),
             ]
         );
